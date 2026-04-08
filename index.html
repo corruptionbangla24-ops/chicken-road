@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - Premium</title>
+    <title>Chicken Road - Pro</title>
     <style>
         :root { --neon-green: #39ff14; --gold: #ffd700; --dark-bg: #0d0f14; }
-        body { background: var(--dark-bg); color: white; font-family: sans-serif; margin: 0; overflow: hidden; }
+        body { background: var(--dark-bg); color: white; font-family: sans-serif; margin: 0; overflow: hidden; touch-action: manipulation; }
         
-        /* গেম এরিয়া */
         .game-view { 
             display: flex; height: 60vh; overflow-x: auto; position: relative; 
             background: #111; padding-left: 0; scroll-behavior: smooth;
             border-bottom: 2px solid #333;
         }
 
-        /* কলাম বা রাস্তা */
         .road-column {
             min-width: 100px; height: 100%; border-right: 1px solid rgba(57, 255, 20, 0.2);
             position: relative; flex-shrink: 0;
@@ -23,45 +21,41 @@
 
         .start-zone { background: rgba(57, 255, 20, 0.05); min-width: 110px; }
 
-        /* গাড়ি */
         .traffic-car {
-            position: absolute; width: 80%; left: 10%;
-            height: 150px; top: -200px; z-index: 5; 
-            object-fit: contain;
+            position: absolute; width: 90%; left: 5%;
+            height: 180px; top: -300px; z-index: 5; 
+            object-fit: contain; pointer-events: none;
         }
 
-        /* ব্যারিয়ার */
         .barrier-img {
-            position: absolute; width: 100%; height: 80px;
+            position: absolute; width: 100%; height: 100px;
             top: 50%; left: 0; transform: translateY(-50%);
-            opacity: 0; z-index: 10; transition: opacity 0.3s;
+            opacity: 0; z-index: 10; transition: opacity 0.3s ease;
+            pointer-events: none;
         }
         .active-barrier .barrier-img { opacity: 1; }
 
-        /* মুরগি */
         #chicken { 
-            position: absolute; width: 70px; height: auto;
+            position: absolute; width: 80px; height: auto;
             bottom: 15px; left: 20px; z-index: 15;
-            transition: left 0.4s ease, bottom 0.2s ease;
+            transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), bottom 0.2s ease;
             filter: drop-shadow(0 0 10px var(--neon-green));
         }
 
-        /* কন্ট্রোল প্যানেল */
         .controls { background: #1c1f26; padding: 20px; height: 40vh; border-top: 3px solid var(--neon-green); box-sizing: border-box; }
         .status-box { text-align: center; color: var(--gold); margin-bottom: 15px; font-weight: bold; font-size: 18px; min-height: 25px;}
         .btn-container { display: flex; gap: 10px; }
         .btn { flex: 1; padding: 18px; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         #playBtn { background: var(--neon-green); color: black; }
-        #cashBtn { background: #ffc107; color: black; opacity: 0.5; }
+        #cashBtn { background: #ffc107; color: black; }
+        #cashBtn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .info-row { margin-top: 20px; display: flex; justify-content: space-between; font-size: 16px; color: #bbb; }
     </style>
 </head>
 <body>
 
-    <div class="game-view" id="gameView">
-        <!-- জাভাস্ক্রিপ্ট দিয়ে লোড হবে -->
-    </div>
+    <div class="game-view" id="gameView"></div>
 
     <div class="controls">
         <div class="status-box" id="status">গেম শুরু করতে PLAY বাটনে ক্লিক করুন</div>
@@ -93,13 +87,11 @@
         carIntervals.forEach(interval => clearInterval(interval));
         carIntervals = [];
         
-        // ১. নিরাপদ জোন তৈরি
         const startCol = document.createElement('div');
         startCol.className = 'road-column start-zone';
         startCol.innerHTML = '<div style="position:absolute; bottom:10px; width:100%; text-align:center; font-size:12px; color:var(--neon-green);">SAFE ZONE</div>';
         gameView.appendChild(startCol);
 
-        // ২. ট্রাফিক কলাম তৈরি
         for (let i = 1; i <= totalSteps; i++) {
             const col = document.createElement('div');
             col.className = 'road-column';
@@ -110,31 +102,28 @@
             if(i === totalSteps) multiplier = "20,000";
 
             col.innerHTML = `
-                <img src="${carImg}" class="traffic-car" id="car-${i}" onerror="this.src='https://placeholder.com'">
-                <img src="barrier.png" class="barrier-img" id="barrier-${i}" onerror="this.style.background='rgba(255,255,255,0.2)'">
+                <img src="${carImg}" class="traffic-car" id="car-${i}" onerror="this.style.background='red'">
+                <img src="barrier.png" class="barrier-img" id="barrier-${i}" onerror="this.style.background='rgba(255,255,255,0.3)'">
                 <div style="position:absolute; bottom:10px; width:100%; text-align:center; font-weight:bold; color:var(--neon-green);">${multiplier}x</div>
             `;
-            // কলামে ক্লিক করলে মুরগি লাফাবে
             col.onclick = () => { if(isPlaying) moveChicken(i); };
             gameView.appendChild(col);
             startTraffic(i);
         }
         
-        // শুরুতে মুরগির পজিশন
         setTimeout(() => {
-            const chicken = document.getElementById('chicken');
-            if(chicken) chicken.style.left = "20px";
-        }, 100);
+            const ch = document.getElementById('chicken');
+            if(ch) ch.style.left = "15px";
+        }, 50);
     }
 
     function startTraffic(id) {
         const col = document.getElementById(`col-${id}`);
         const car = document.getElementById(`car-${id}`);
-        let carPos = -(Math.random() * 500 + 200);
-        let speed = 5 + (Math.random() * 6);
+        let carPos = -(Math.random() * 600 + 300);
+        let speed = 4 + (Math.random() * 6);
         let barrierActive = false;
 
-        // ব্যারিয়ার লজিক
         const bInterval = setInterval(() => {
             if(!isPlaying) return;
             barrierActive = Math.random() > 0.6;
@@ -142,19 +131,19 @@
             else col.classList.remove('active-barrier');
         }, 2500);
 
-        // গাড়ির মুভমেন্ট লজিক
         const cInterval = setInterval(() => {
             if(!isPlaying) return;
 
-            if (barrierActive && carPos >= 100 && carPos <= 130) { 
-                carPos = 115; 
+            // ব্যারিয়ার লজিক - গাড়ি আটকানো
+            if (barrierActive && carPos >= 80 && carPos <= 120) { 
+                carPos = 100; // ব্যারিয়ার পজিশনে ফিক্সড
             } else {
                 carPos += speed;
             }
 
             if (carPos > gameView.offsetHeight) {
-                carPos = -200; 
-                speed = 5 + (Math.random() * 6); // প্রতিবার স্পিড পরিবর্তন
+                carPos = -250; 
+                speed = 4 + (Math.random() * 6);
             }
             car.style.top = carPos + 'px';
 
@@ -169,91 +158,84 @@
             isPlaying = true;
             currentStep = 0;
             initBoard();
-            
             playBtn.disabled = true;
             playBtn.style.opacity = "0.5";
             cashBtn.disabled = false;
-            cashBtn.style.opacity = "1";
-            
-            statusText.innerText = "গেম শুরু! সাবধানে রাস্তা পার হোন।";
+            statusText.innerText = "গেম চলছে! ব্যারিয়ার দেখে সাবধানে এগোন।";
             statusText.style.color = "var(--gold)";
-            
-            // প্রথম ঘরে অটো মুভ
-            setTimeout(() => { moveChicken(1); }, 500);
+            setTimeout(() => { moveChicken(1); }, 400);
         }
     }
 
     function moveChicken(id) {
         if(!isPlaying || id !== currentStep + 1) return;
-        
         const chicken = document.getElementById('chicken');
         const targetCol = document.getElementById(`col-${id}`);
-        
         if (!targetCol) return;
 
-        // লাফানোর অ্যানিমেশন
         chicken.style.bottom = "100px"; 
-        chicken.style.left = (targetCol.offsetLeft + 15) + 'px';
+        chicken.style.left = (targetCol.offsetLeft + (targetCol.offsetWidth / 2) - (chicken.offsetWidth / 2)) + 'px';
         
-        setTimeout(() => {
-            chicken.style.bottom = "15px"; 
-        }, 200);
-
+        setTimeout(() => { chicken.style.bottom = "15px"; }, 200);
         currentStep = id;
         
         let displayMult = (id === totalSteps) ? "20,000" : (1 + id * 0.5).toFixed(2);
         multDisplay.innerText = `Multiplier: ${displayMult}x`;
-        
-        // অটো স্ক্রল
         gameView.scrollTo({ left: targetCol.offsetLeft - 100, behavior: 'smooth' });
     }
 
-function checkCollision(id, car, barrierActive) {
-    const chicken = document.getElementById('chicken');
-    if(currentStep !== id || !chicken || barrierActive) return;
+    function checkCollision(id, car, barrierActive) {
+        const chicken = document.getElementById('chicken');
+        // ব্যারিয়ার একটিভ থাকলে কোনো কলিশন হবে না (মুরগি নিরাপদ)
+        if(currentStep !== id || !chicken || barrierActive) return;
 
-    const cRect = chicken.getBoundingClientRect();
-    const carRect = car.getBoundingClientRect();
+        const cRect = chicken.getBoundingClientRect();
+        const carRect = car.getBoundingClientRect();
 
-    // কলিশন ডিটেকশন (গাড়ি মুরগির সীমানায় ঢুকলে)
-    if (cRect.left < carRect.right && cRect.right > carRect.left &&
-        cRect.top < carRect.bottom && cRect.bottom > carRect.top) {
-        
-        isPlaying = false; // সাথে সাথে গেম লজিক বন্ধ
+        // নিখুঁত কলিশন বক্স
+        const padX = 20; 
+        const padY = 25;
 
-        // ১. সব মুভমেন্ট ইন্টারভ্যাল ক্লিয়ার করা যাতে আর মুভ না করে
-        carIntervals.forEach(interval => clearInterval(interval));
+        if (cRect.left + padX < carRect.right && 
+            cRect.right - padX > carRect.left &&
+            cRect.top + padY < carRect.bottom && 
+            cRect.bottom - padY > carRect.top) {
+            
+            isPlaying = false;
+            // সব গাড়ি থামিয়ে দেওয়া
+            carIntervals.forEach(interval => clearInterval(interval));
 
-        // ২. গাড়িটিকে ঠিক মুরগির ওপর বসিয়ে দেওয়া (নিখুঁত পজিশনিং)
-        // মুরগির সেন্টার এবং গাড়ির সেন্টার এক করে দেওয়া হচ্ছে
-        const chickenTop = chicken.offsetTop;
-        const chickenHeight = chicken.offsetHeight;
-        const carHeight = car.offsetHeight;
+            // গাড়িটিকে ঠিক মুরগির গায়ের ওপর সেট করা
+            car.style.transition = "none";
+            const finalTop = chicken.offsetTop - (car.offsetHeight / 2) + 20;
+            car.style.top = finalTop + "px";
+            car.style.zIndex = "100";
 
-        // গাড়িটি মুরগির সামান্য উপরে (যাতে ধাক্কা দেওয়ার লুক আসে)
-        car.style.transition = "none"; // ট্রানজিশন থাকলে তা বন্ধ করা জরুরি
-        car.style.top = (chickenTop - (carHeight / 2) + (chickenHeight / 2)) + "px";
-        car.style.zIndex = "100"; // মুরগির উপরে দেখানোর জন্য
-
-        handleGameOver();
+            handleGameOver();
+        }
     }
-}
 
-function handleGameOver() {
-    const chicken = document.getElementById('chicken');
-    
-    // মুরগিটিকে একটু চ্যাপ্টা বা দুমড়ে যাওয়ার এফেক্ট দেওয়া
-    chicken.style.transform = "scaleY(0.6) rotate(15deg)";
-    chicken.style.filter = "brightness(0.5) sepia(1)";
-    
-    statusText.innerText = "💥 দুর্ঘটনা! গাড়িটি মুরগিকে পিষে দিয়েছে।";
-    statusText.style.color = "red";
-    
-    setTimeout(() => { 
-        alert("ওহ না! আপনার মুরগিটি দুর্ঘটনার কবলে পড়েছে।"); 
-        reset(); 
-    }, 500);
-}
+    function handleGameOver() {
+        const chicken = document.getElementById('chicken');
+        chicken.style.filter = "grayscale(1) brightness(0.5)";
+        chicken.style.transform = "scale(0.8) rotate(10deg)";
+        
+        statusText.innerText = "💥 দুর্ঘটনা! গাড়ি মুরগিকে ধাক্কা দিয়েছে।";
+        statusText.style.color = "red";
+        
+        setTimeout(() => { 
+            alert("ওহ না! আপনার মুরগিটি দুর্ঘটনার কবলে পড়েছে।"); 
+            reset(); 
+        }, 600);
+    }
+
+    function cashOut() {
+        if(currentStep > 0) {
+            let winAmount = (currentStep === totalSteps) ? "20,000" : (1 + currentStep * 0.5).toFixed(2);
+            alert(`অভিনন্দন! আপনি ${winAmount}x মাল্টিপ্লায়ারে ক্যাশ আউট করেছেন।`);
+            reset();
+        }
+    }
 
     function reset() {
         isPlaying = false;
@@ -261,15 +243,14 @@ function handleGameOver() {
         playBtn.disabled = false; 
         playBtn.style.opacity = "1";
         cashBtn.disabled = true; 
-        cashBtn.style.opacity = "0.5";
         multDisplay.innerText = "Multiplier: 1.00x";
         statusText.innerText = "আবার শুরু করতে PLAY বাটনে ক্লিক করুন।";
         initBoard();
     }
 
-    // শুরুতে বোর্ড লোড করা
     initBoard();
 </script>
 </body>
 </html>
-        
+
+             
