@@ -41,28 +41,28 @@
     transition: top 0.04s linear;
 }
 
-
-
-
-        /* গোপন ব্যারিয়ার */
-        .barrier-img {
+.barrier-img {
     position: absolute; 
-    width: 100%;       /* ব্যারিয়ারটি কলামের এক বর্ডার থেকে অন্য বর্ডার পর্যন্ত চওড়া হবে */
-    height: 120px;     /* উচ্চতা বাড়িয়ে দিলাম যাতে এটি অনেক বড় দেখায় */
+    width: 100%;       /* দুই লাইনের মাঝখানের পুরো জায়গা নিবে */
+    height: 120px; 
     top: 50%; 
-        left: 0;
-    transform: translateY(-50%) scale(1);
-    object-fit: fill;
-
+    left: 0;           /* একদম বাম বর্ডার থেকে শুরু হবে */
+    transform: translateY(-50%) scaleX(1); /* মাঝখানে থাকবে কিন্তু ডানে-বামে সরবে না */
+    object-fit: fill;  /* ইমেজটিকে দুই পাশে টেনে বর্ডার পর্যন্ত লাগিয়ে দিবে */
     opacity: 0; 
     z-index: 10;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    filter: drop-shadow(0 0 15px rgba(255, 193, 7, 0.5)); /* ব্যারিয়ারে সোনালী গ্লো */
 }
 
-        .active-barrier .barrier-img { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.active-barrier .barrier-img {
+    opacity: 1;
+    transform: translateY(-50%) scaleX(1); /* সক্রিয় হলে পুরোটা দেখাবে */
+}
 
-        /* মুরগি */
+
+
+        
+
         
 /* মুরগি */
 #chicken { 
