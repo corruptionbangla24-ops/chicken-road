@@ -29,10 +29,10 @@
     position: absolute; 
     width: 100%; 
     height: 250px; 
-    top: -350px; /* শুরুর পজিশন আরও উপরে */
+    top: -400px; 
     left: 0;
     z-index: 5; 
-    transition: top 0.04s linear; /* ট্রানজিশন লিনিয়ার রাখুন যাতে হেঁচকা টান না লাগে */
+    /* transition: top 0.04s linear; <-- এই লাইনটি ডিলিট করে দিন বা মুছে ফেলুন */
     object-fit: fill; 
 }
 
@@ -146,25 +146,30 @@
         }, 2500);
 
         const interval = setInterval(() => {
-            if(!isPlaying) return;
+    if(!isPlaying) return;
 
-            // গাড়ি ব্যারিয়ারে আটকানোর পজিশন (আপনার স্ক্রিনশট অনুযায়ী অ্যাডজাস্ট করা)
-            if (barrierActive && carPos >= 20 && carPos <= 50) { 
-                carPos = 35; 
-            } else {
-                carPos += speed;
-            }
+    if (barrierActive && carPos >= 20 && carPos <= 50) { 
+        carPos = 35; 
+    } else {
+        carPos += speed;
+    }
 
-            // এই অংশটুকু জাভাস্ক্রিপ্টে আপডেট করুন
-if (carPos > gameView.offsetHeight) {
-    carPos = -400; // আগে -300 ছিল, এখন -400 করলাম যাতে গাড়িটি অনেকটা উপর থেকে আসে
-    if(id !== totalSteps) car.src = carImages[Math.floor(Math.random() * 3)];
-}
+    if (carPos > gameView.offsetHeight) {
+        // গাড়ি নিচ থেকে উপরে যাওয়ার সময় যাতে দেখা না যায়
+        car.style.transition = "none"; // ট্রানজিশন বন্ধ
+        carPos = -400; 
+        car.style.top = carPos + 'px';
+        
+        if(id !== totalSteps) car.src = carImages[Math.floor(Math.random() * 3)];
 
+        // সামান্য সময় পর আবার ট্রানজিশন চালু (যদি প্রয়োজন হয়, তবে আমরা এটি ছাড়াই স্মুথ করতে পারি)
+    } else {
+        car.style.top = carPos + 'px';
+    }
 
-            car.style.top = carPos + 'px';
-            checkCollision(id, car, barrierActive);
-        }, 30);
+    checkCollision(id, car, barrierActive);
+}, 30);
+
         carIntervals.push(interval);
     }
 
