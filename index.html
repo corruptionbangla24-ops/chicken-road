@@ -207,41 +207,58 @@
         // অটো স্ক্রল
         gameView.scrollTo({ left: targetCol.offsetLeft - 100, behavior: 'smooth' });
     }
+function checkCollision(id, car, barrierActive) {
+    const chicken = document.getElementById('chicken');
+    // মুরগি যদি সেই কলামে না থাকে বা ব্যারিয়ার সচল থাকে তবে কলিশন হবে না
+    if(currentStep !== id || !chicken || barrierActive) return;
 
-    function checkCollision(id, car, barrierActive) {
-        const chicken = document.getElementById('chicken');
-        if(currentStep !== id || !chicken || barrierActive) return;
+    const cRect = chicken.getBoundingClientRect();
+    const carRect = car.getBoundingClientRect();
 
-        const cRect = chicken.getBoundingClientRect();
-        const carRect = car.getBoundingClientRect();
+    // কলিশন বক্স (Padding দিয়ে টিউনিং করা হয়েছে)
+    const padding = 20;
 
-        // কলিশন বক্স ছোট করা হয়েছে নিখুঁত অনুভূতির জন্য
-        const padding = 20;
+    if (cRect.left + padding < carRect.right && 
+        cRect.right - padding > carRect.left &&
+        cRect.top + padding < carRect.bottom && 
+        cRect.bottom - padding > carRect.top) {
+        
+        // গাড়িটিকে ঠিক মুরগির গায়ের ওপর সেট করার জন্য car-এর top পজিশন আপডেট
+        const finalCarTop = chicken.offsetTop - (car.offsetHeight / 2);
+        car.style.top = finalCarTop + 'px';
+        
+        handleGameOver(car);
+    }
+}
 
-        if (cRect.left + padding < carRect.right && 
-            cRect.right - padding > carRect.left &&
-            cRect.top + padding < carRect.bottom && 
-            cRect.bottom - padding > carRect.top) {
-            
-            handleGameOver();
-        }
+function handleGameOver(collidedCar) {
+    if(!isPlaying) return;
+    isPlaying = false;
+    
+    const chicken = document.getElementById('chicken');
+    
+    // সব ইন্টারভ্যাল বন্ধ করা যাতে অন্য কোনো গাড়ি না নড়ে
+    carIntervals.forEach(interval => clearInterval(interval));
+    
+    // ভিজ্যুয়াল এফেক্ট: মুরগি এবং ধাক্কা দেওয়া গাড়িটি ফোকাস করা
+    chicken.style.filter = "grayscale(1) brightness(0.4) sepia(1) hue-rotate(-50deg)";
+    chicken.style.transform = "scale(0.9) rotate(20deg)";
+    
+    if(collidedCar) {
+        collidedCar.style.zIndex = "20"; // গাড়িটি মুরগির ওপরে দেখাবে
+        collidedCar.style.filter = "brightness(0.7)";
     }
 
-    function handleGameOver() {
-        isPlaying = false;
-        const chicken = document.getElementById('chicken');
-        chicken.style.filter = "grayscale(1) brightness(0.3)";
-        chicken.style.transform = "scale(0.8) rotate(90deg)";
-        
-        statusText.innerText = "💥 দুর্ঘটনা! আপনি হেরে গেছেন।";
-        statusText.style.color = "red";
-        
-        setTimeout(() => { 
-            alert("ওহ না! আপনার মুরগিটি দুর্ঘটনার কবলে পড়েছে।"); 
-            reset(); 
-        }, 500);
-    }
+    statusText.innerText = "💥 দুর্ঘটনা! গাড়িটি মুরগিকে ধাক্কা দিয়েছে।";
+    statusText.style.color = "red";
+    
+    setTimeout(() => { 
+        alert("ওহ না! আপনার মুরগিটি দুর্ঘটনার কবলে পড়েছে।"); 
+        reset(); 
+    }, 600);
+}
 
+    
     function cashOut() {
         if(currentStep > 0) {
             let winAmount = (currentStep === totalSteps) ? "20,000" : (1 + currentStep * 0.5).toFixed(2);
