@@ -196,20 +196,35 @@
     }
 
     function moveChicken(id) {
-        if(!isPlaying || id !== currentStep + 1) return;
-        const chicken = document.getElementById('chicken');
-        const targetCol = document.getElementById(`col-${id}`);
+    if(!isPlaying || id !== currentStep + 1) return;
+    const chicken = document.getElementById('chicken');
+    const targetCol = document.getElementById(`col-${id}`);
+    
+    // মুরগিটিকে লাফ দেওয়ার এবং দৌড়ানোর একটি ভাব দেওয়া
+    chicken.style.transition = "left 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.2s ease-out";
+    
+    // লাফ দেওয়ার জন্য bottom পজিশন সাময়িকভাবে বাড়ানো
+    chicken.style.bottom = "80px"; 
+    
+    setTimeout(() => {
+        // নতুন কলামে পৌঁছানোর পজিশন
+        chicken.style.left = (targetCol.offsetLeft + (targetCol.offsetWidth / 2)) + 'px';
         
-        // মুরগি লাফ দিবে
-        chicken.style.left = (targetCol.offsetLeft + 10) + 'px';
-        currentStep = id;
-        
-        let displayMult = (1 + id * 0.5).toFixed(2);
-        if(id === totalSteps) displayMult = "20,000";
-        multDisplay.innerText = `Multiplier: ${displayMult}x`;
-        
-        gameView.scrollTo({ left: targetCol.offsetLeft - 100, behavior: 'smooth' });
-    }
+        // পুনরায় নিচে নামিয়ে আনা
+        setTimeout(() => {
+            chicken.style.bottom = "15px"; 
+        }, 200);
+    }, 50);
+
+    currentStep = id;
+    let displayMult = (1 + id * 0.5).toFixed(2);
+    if(id === 30) displayMult = "20,000";
+    multDisplay.innerText = `Multiplier: ${displayMult}x`;
+    
+    // স্ক্রিনটি মুরগির সাথে সাথে মুভ করবে
+    gameView.scrollTo({ left: targetCol.offsetLeft - 100, behavior: 'smooth' });
+}
+
 
     function checkCollision(id, car, barrierActive) {
         const chicken = document.getElementById('chicken');
