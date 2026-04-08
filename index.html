@@ -45,18 +45,20 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .active-barrier .barrier-img { opacity: 1; }
-
-        
 #chicken { 
     position: absolute; 
-    width: 250px;      /* মুরগিটিকে অনেক বড় করতে ২৫০ পিক্সেল করলাম */
+    width: 280px;      /* মুরগিটিকে আপনার চাহিদা মতো অনেক বড় করা হয়েছে */
     height: auto;
-    bottom: 40px;      /* মাল্টিপ্লায়ার লেখার উপরে রাখার জন্য এটি বাড়ানো হলো */
-    left: -75px;       /* বড় মুরগিটি যাতে কলামের মাঝখানে থাকে তার জন্য বামে সরানো হলো */
+    bottom: 50px;      /* মাল্টিপ্লায়ার লেখার ঠিক উপরে পজিশন করার জন্য */
+    left: 50%;         /* কলামের মাঝখানে নেয়ার প্রথম ধাপ */
+    transform: translateX(-50%); /* মুরগিটিকে কলামের একদম সেন্টারে রাখার জন্য */
     z-index: 15;
     transition: left 0.5s ease-in-out; 
     filter: drop-shadow(0 0 15px var(--neon-green));
 }
+
+        
+
 
 
 
