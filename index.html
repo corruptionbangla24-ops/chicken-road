@@ -16,13 +16,14 @@
 
         /* কলাম বা রাস্তা */
         .road-column {
-            min-width: 150px; height: 100%; border-right: 1px dashed rgba(255,255,255,0.1);
-            position: relative; flex-shrink: 0;
-            background: linear-gradient(to bottom, rgba(20,20,20,0.5), rgba(0,0,0,0.8));
-           border-right: 2px solid rgba(57, 255, 20, 0.6); 
-    box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+    min-width: 100px; /* আগে ১৫০ ছিল, এখন ১০০ করলাম যাতে কলাম সরু হয় */
+    height: 100%; 
+    position: relative; 
+    flex-shrink: 0;
+    border-right: 2px solid rgba(57, 255, 20, 0.6); 
+    box-shadow: inset -5px 0 15px rgba(57, 255, 20, 0.1);
+}
 
-        }
 
         /* প্রথম কলাম - নিরাপদ ঘর */
         .start-zone { background: rgba(57, 255, 20, 0.05); min-width: 120px; }
