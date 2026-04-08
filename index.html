@@ -26,10 +26,16 @@
 
         /* গাড়িগুলোর স্টাইল - আপনার চাওয়া অনুযায়ী অনেক বড় */
         .traffic-car {
-            position: absolute; width: 100%; height: 250px;
-            top: -300px; left: 0; z-index: 5; transition: top 0.04s linear;
-            object-fit: fill; 
-        }
+    position: absolute; 
+    width: 100%; 
+    height: 250px; 
+    top: -350px; /* শুরুর পজিশন আরও উপরে */
+    left: 0;
+    z-index: 5; 
+    transition: top 0.04s linear; /* ট্রানজিশন লিনিয়ার রাখুন যাতে হেঁচকা টান না লাগে */
+    object-fit: fill; 
+}
+
 
         /* গোপন ব্যারিয়ার - পুরো চওড়া */
         .barrier-img {
@@ -149,10 +155,12 @@
                 carPos += speed;
             }
 
-            if (carPos > gameView.offsetHeight) {
-                carPos = -300;
-                if(id !== totalSteps) car.src = carImages[Math.floor(Math.random() * 3)];
-            }
+            // এই অংশটুকু জাভাস্ক্রিপ্টে আপডেট করুন
+if (carPos > gameView.offsetHeight) {
+    carPos = -400; // আগে -300 ছিল, এখন -400 করলাম যাতে গাড়িটি অনেকটা উপর থেকে আসে
+    if(id !== totalSteps) car.src = carImages[Math.floor(Math.random() * 3)];
+}
+
 
             car.style.top = carPos + 'px';
             checkCollision(id, car, barrierActive);
