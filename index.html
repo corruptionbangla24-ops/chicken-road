@@ -47,10 +47,17 @@
         .active-barrier .barrier-img { opacity: 1; }
 
         /* রাজকীয় মুরগি */
-        #chicken { 
-            position: absolute; width: 85px; bottom: 25px; left: 15px; z-index: 15;
-            transition: left 0.5s ease-in-out; filter: drop-shadow(0 0 10px var(--neon-green));
-        }
+        /* মুরগি */
+#chicken { 
+    position: absolute; 
+    width: 130px;      /* আগে ৮৫ ছিল, এখন ১৩০ করলাম যাতে স্পষ্ট দেখায় */
+    height: auto;
+    bottom: 20px;      /* সাইজ বাড়ায় পজিশন একটু নিচে নামিয়ে দিলাম */
+    left: 10px;        /* কলামের ভেতর ঠিকমতো বসার জন্য */
+    z-index: 15;
+    transition: left 0.5s ease-in-out; 
+    filter: drop-shadow(0 0 12px var(--neon-green));
+}
 
         /* কন্ট্রোল প্যানেল */
         .controls { background: #1c1f26; padding: 15px; height: 35vh; border-top: 3px solid var(--neon-green); box-sizing: border-box; }
