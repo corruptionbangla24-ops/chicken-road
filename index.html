@@ -204,36 +204,34 @@
     }
 }
 
-
-    function moveChicken(id) {
+function moveChicken(id) {
+    // এই লাইনটি চেক করুন যেন id বর্তমান ধাপের পরের ধাপ হয়
     if(!isPlaying || id !== currentStep + 1) return;
+    
     const chicken = document.getElementById('chicken');
     const targetCol = document.getElementById(`col-${id}`);
     
-    // মুরগিটিকে লাফ দেওয়ার এবং দৌড়ানোর একটি ভাব দেওয়া
-    chicken.style.transition = "left 0.4s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.2s ease-out";
-    
-    // লাফ দেওয়ার জন্য bottom পজিশন সাময়িকভাবে বাড়ানো
+    if (!targetCol) return; // কলাম না থাকলে ফিরে যাবে
+
+    // মুরগির দৌড়ানোর এবং লাফানোর অ্যানিমেশন
     chicken.style.bottom = "80px"; 
+    chicken.style.left = (targetCol.offsetLeft + (targetCol.offsetWidth / 2)) + 'px';
     
     setTimeout(() => {
-        // নতুন কলামে পৌঁছানোর পজিশন
-        chicken.style.left = (targetCol.offsetLeft + (targetCol.offsetWidth / 2)) + 'px';
-        
-        // পুনরায় নিচে নামিয়ে আনা
-        setTimeout(() => {
-            chicken.style.bottom = "15px"; 
-        }, 200);
-    }, 50);
+        chicken.style.bottom = "15px"; 
+    }, 200);
 
     currentStep = id;
+    
+    // মাল্টিপ্লায়ার আপডেট
     let displayMult = (1 + id * 0.5).toFixed(2);
-    if(id === 30) displayMult = "20,000";
     multDisplay.innerText = `Multiplier: ${displayMult}x`;
     
     // স্ক্রিনটি মুরগির সাথে সাথে মুভ করবে
     gameView.scrollTo({ left: targetCol.offsetLeft - 100, behavior: 'smooth' });
 }
+
+    
 
 
     function checkCollision(id, car, barrierActive) {
