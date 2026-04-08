@@ -50,9 +50,10 @@
     width: 100%;       /* ব্যারিয়ারটি কলামের এক বর্ডার থেকে অন্য বর্ডার পর্যন্ত চওড়া হবে */
     height: 120px;     /* উচ্চতা বাড়িয়ে দিলাম যাতে এটি অনেক বড় দেখায় */
     top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%) scale(0);
-    object-fit: contain; /* ইমেজটি যাতে ফেটে না যায় */
+        left: 0;
+    transform: translateY(-50%) scale(1);
+    object-fit: fill;
+
     opacity: 0; 
     z-index: 10;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -62,10 +63,19 @@
         .active-barrier .barrier-img { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
         /* মুরগি */
-        #chicken { 
-            position: absolute; width: 65px; bottom: 20px; left: 30px; z-index: 15;
-            transition: left 0.5s ease-in-out; filter: drop-shadow(0 0 10px var(--neon-green));
-        }
+        
+/* মুরগি */
+#chicken { 
+    position: absolute; 
+    width: 80px;      /* মুরগিটি বড় করতে এটি ৮০-১০০ পিক্সেল করতে পারেন */
+    height: auto;
+    bottom: 25px; 
+    left: 30px; 
+    z-index: 15;
+    transition: left 0.5s ease-in-out; 
+    /* মুরগির নিচে একটি সুন্দর সবুজ নিয়ন গ্লো */
+    filter: drop-shadow(0 0 10px #39ff14);
+}
 
         /* কন্ট্রোল প্যানেল */
         .controls { background: #1c1f26; padding: 15px; height: 35vh; border-top: 3px solid var(--neon-green); box-sizing: border-box; }
