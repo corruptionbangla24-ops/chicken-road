@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
@@ -8,61 +8,62 @@
         :root { --green: #2ecc71; --yellow: #f1c40f; --dark: #1a1a1a; --gray: #333; }
         body { background: #222; color: white; font-family: Arial, sans-serif; margin: 0; overflow: hidden; }
 
-        /* হেডার ব্যালেন্স বার */
         .header { background: #111; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #444; }
         .balance-box { background: #000; padding: 5px 15px; border-radius: 20px; color: #fff; font-weight: bold; }
 
         /* গেম এরিয়া */
         .game-view { 
             display: flex; height: 55vh; overflow-x: auto; position: relative; 
-            background: #444; scroll-behavior: smooth;
+            background: #2c3e50; scroll-behavior: smooth; align-items: flex-end;
         }
 
         .road-column {
-            min-width: 130px; height: 100%; border-right: 2px dashed #666;
-            position: relative; flex-shrink: 0;
-            background: #333; /* পিচ ঢালা রাস্তা */
+            min-width: 140px; height: 100%; border-right: 2px dashed #555;
+            position: relative; flex-shrink: 0; background: #34495e;
         }
 
-        .traffic-car { position: absolute; width: 90%; left: 5%; height: 180px; top: -300px; z-index: 5; object-fit: contain; }
+        .traffic-car { 
+            position: absolute; width: 80px; left: 50%; transform: translateX(-50%);
+            height: 120px; top: -150px; z-index: 5; object-fit: contain;
+            background: rgba(255,0,0,0.2); border-radius: 10px; /* ছবি না থাকলে বক্স দেখাবে */
+        }
         
         .barrier-img { 
-            position: absolute; width: 100%; height: 80px; top: 40%; left: 0; 
-            transform: translateY(-50%); opacity: 0; z-index: 10; 
+            position: absolute; width: 100%; height: 60px; top: 45%; left: 0; 
+            background: rgba(243, 156, 18, 0.6); display: none; z-index: 10; 
         }
-        .active-barrier .barrier-img { opacity: 1; }
+        .active-barrier .barrier-img { display: block; }
 
-        /* মাল্টিপ্লায়ার সার্কেল (মেনহোল ডিজাইন) */
         .multiplier-circle {
-            position: absolute; width: 70px; height: 70px; border-radius: 50%;
-            background: #222; border: 3px solid #555; bottom: 20%; left: 50%;
+            position: absolute; width: 60px; height: 60px; border-radius: 50%;
+            background: #111; border: 2px solid #f1c40f; bottom: 15%; left: 50%;
             transform: translateX(-50%); display: flex; align-items: center;
-            justify-content: center; font-weight: bold; color: #888; font-size: 14px;
+            justify-content: center; font-weight: bold; color: #f1c40f; font-size: 14px;
         }
 
         #chicken { 
-            position: absolute; width: 70px; bottom: 20%; left: 30px; 
-            z-index: 15; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: absolute; width: 60px; bottom: 15%; left: 40px; 
+            z-index: 15; transition: all 0.3s ease-out;
         }
 
         /* কন্ট্রোল প্যানেল */
         .footer { height: 35vh; background: #1a1a1a; padding: 15px; box-sizing: border-box; }
         .bet-buttons { display: flex; gap: 5px; margin-bottom: 15px; justify-content: center; }
-        .bet-btn { background: #333; border: none; color: white; padding: 10px; border-radius: 5px; flex: 1; }
+        .bet-btn { background: #333; border: none; color: white; padding: 10px; border-radius: 5px; flex: 1; cursor: pointer; }
 
         .action-btns { display: flex; gap: 10px; height: 80px; }
         .btn-main { flex: 1; border: none; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; }
         .cashout { background: var(--yellow); color: #000; }
         .go-btn { background: var(--green); color: #fff; }
-        .btn-main:disabled { opacity: 0.3; }
+        .btn-main:disabled { opacity: 0.3; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div style="color: #bbb; font-size: 12px;">CHICKEN ROAD</div>
-    <div class="balance-box">999 994 $</div>
-    <div style="font-size: 20px;">☰</div>
+    <div style="color: #bbb; font-size: 12px;">CHICKEN ROAD PRO</div>
+    <div class="balance-box" id="balance">999,994 $</div>
+    <div style="font-size: 20px; cursor: pointer;">☰</div>
 </div>
 
 <div class="game-view" id="gameView"></div>
@@ -94,7 +95,9 @@
     const totalSteps = 30;
 
     function initBoard() {
-        gameView.innerHTML = `<img src="chicken.png" id="chicken" alt="🐔">`;
+        gameView.innerHTML = `<img src="chicken.png" id="chicken" alt="🐔" onerror="this.src='https://flaticon.com'">`;
+        
+        // পুরাতন ইন্টারভাল পরিষ্কার করা
         carIntervals.forEach(clearInterval);
         carIntervals = [];
 
@@ -103,50 +106,55 @@
         startCol.className = 'road-column';
         gameView.appendChild(startCol);
 
-   for (let i = 1; i <= totalSteps; i++) {
-    const col = document.createElement('div');
-    col.className = 'road-column';
-    col.id = `col-${i}`;
-    let mult = (1 + i * 0.15).toFixed(2);
+        for (let i = 1; i <= totalSteps; i++) {
+            const col = document.createElement('div');
+            col.className = 'road-column';
+            col.id = `col-${i}`;
+            let mult = (1 + i * 0.15).toFixed(2);
+            
+            // রেন্ডম গাড়ি ইমেজ সিলেক্ট
+            let carNum = Math.floor(Math.random() * 3) + 1;
 
-    // ১ থেকে ৩ এর মধ্যে একটি রেন্ডম সংখ্যা বেছে নিয়ে গাড়ির নাম তৈরি করা
-    let carNumber = Math.floor(Math.random() * 3) + 1; 
-    let carFileName = `car${carNumber}.png`;
-
-    col.innerHTML = `
-        <img src="${carFileName}" class="traffic-car" id="car-${i}">
-        <img src="barrier.png" class="barrier-img" id="barrier-${i}">
-        <div class="multiplier-circle">${mult}x</div>
-    `;
-    gameView.appendChild(col);
-    startTraffic(i);
-}
-
+            col.innerHTML = `
+                <img src="car${carNum}.png" class="traffic-car" id="car-${i}" alt="🚗" onerror="this.style.background='red'">
+                <div class="barrier-img" id="barrier-${i}"></div>
+                <div class="multiplier-circle">${mult}x</div>
+            `;
+            gameView.appendChild(col);
+            startTraffic(i);
+        }
+    }
 
     function startTraffic(id) {
         const col = document.getElementById(`col-${id}`);
         const car = document.getElementById(`car-${id}`);
-        let carPos = -(Math.random() * 500 + 200);
-        let speed = 4 + (Math.random() * 4);
+        let carPos = -(Math.random() * 600 + 200);
+        let speed = 3 + (Math.random() * 5);
         let barrierActive = false;
 
+        // ব্যারিয়ার লজিক
         const bInt = setInterval(() => {
-            if(!isPlaying) return;
-            barrierActive = Math.random() > 0.5;
+            barrierActive = Math.random() > 0.6;
             if(barrierActive) col.classList.add('active-barrier');
             else col.classList.remove('active-barrier');
-        }, 2000);
+        }, 2500);
 
+        // গাড়ি চলার লজিক
         const cInt = setInterval(() => {
             if(!isPlaying) return;
-            if (barrierActive && carPos >= 60 && carPos <= 100) carPos = 80;
-            else carPos += speed;
+
+            if (barrierActive && carPos >= 100 && carPos <= 140) {
+                carPos = 120; // ব্যারিয়ার থাকলে গাড়ি থেমে থাকবে
+            } else {
+                carPos += speed;
+            }
 
             if (carPos > gameView.offsetHeight) carPos = -200;
             car.style.top = carPos + 'px';
 
             checkCollision(id, car, barrierActive);
         }, 30);
+
         carIntervals.push(bInt, cInt);
     }
 
@@ -156,6 +164,7 @@
             currentStep = 0;
             initBoard();
             cashBtn.disabled = false;
+            playBtn.innerText = "JUMP";
             moveChicken(1);
         } else {
             moveChicken(currentStep + 1);
@@ -167,43 +176,54 @@
         const chicken = document.getElementById('chicken');
         const targetCol = document.getElementById(`col-${id}`);
         
-        chicken.style.bottom = "40%"; // লাফানোর উচ্চতা
-        chicken.style.left = (targetCol.offsetLeft + 30) + 'px';
+        // মুরগির পজিশন ঠিক করা
+        const targetLeft = targetCol.offsetLeft + (targetCol.offsetWidth / 2) - 30;
         
-        setTimeout(() => { chicken.style.bottom = "20%"; }, 250);
+        chicken.style.bottom = "45%"; 
+        chicken.style.left = targetLeft + 'px';
+        
+        setTimeout(() => { chicken.style.bottom = "15%"; }, 200);
         currentStep = id;
         
         let mult = (1 + id * 0.15).toFixed(2);
-        winAmountText.innerText = (mult * 3).toFixed(2) + " USD"; // ডেমো বেট ৩ ডলার ধরে
+        winAmountText.innerText = (mult * 1.0).toFixed(2) + " USD"; // ১ ডলার বেট ধরে
+        
+        // স্ক্রিন অটো স্ক্রল
         gameView.scrollTo({ left: targetCol.offsetLeft - 100, behavior: 'smooth' });
     }
 
     function checkCollision(id, car, barrierActive) {
         const chicken = document.getElementById('chicken');
-        if(currentStep !== id || !chicken || barrierActive) return;
+        if(!isPlaying || currentStep !== id || barrierActive) return;
 
         const cRect = chicken.getBoundingClientRect();
         const carRect = car.getBoundingClientRect();
 
-        if (cRect.top < carRect.bottom && cRect.bottom > carRect.top) {
-            gameOver(car);
+        // সহজ কোলিশন চেক
+        if (cRect.left < carRect.right &&
+            cRect.right > carRect.left &&
+            cRect.top < carRect.bottom &&
+            cRect.bottom > carRect.top) {
+            gameOver();
         }
     }
 
-    function gameOver(hitCar) {
+    function gameOver() {
         isPlaying = false;
-        hitCar.style.top = (document.getElementById('chicken').offsetTop - 50) + "px";
-        alert("GAME OVER!");
+        alert("GAME OVER! মুরগিটি দুর্ঘটনার কবলে পড়েছে।");
         location.reload();
     }
 
     function cashOut() {
-        alert("আপনি জিতেছেন: " + winAmountText.innerText);
+        isPlaying = false;
+        alert("অভিনন্দন! আপনি জিতেছেন: " + winAmountText.innerText);
         location.reload();
     }
 
-    initBoard();
+    // পেজ লোড হলে বোর্ড তৈরি হবে
+    window.onload = initBoard;
+
 </script>
 </body>
 </html>
-                
+   
