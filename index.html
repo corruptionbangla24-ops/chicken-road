@@ -185,15 +185,25 @@
     }
 
     function startGame() {
+    if (!isPlaying) {
         isPlaying = true;
         currentStep = 0;
         initBoard();
         
-        playBtn.disabled = true; playBtn.style.opacity = "0.5";
-        cashBtn.disabled = false; cashBtn.style.opacity = "1";
-        cashBtn.style.cursor = "pointer";
-        statusText.innerText = "গেম চলছে! ব্যারিয়ার দেখে সাবধানে এগোন।";
+        playBtn.disabled = true;
+        playBtn.style.opacity = "0.5";
+        cashBtn.disabled = false;
+        cashBtn.style.opacity = "1";
+        
+        statusText.innerText = "গেম শুরু হয়েছে!";
+        
+        // প্লে বাটনে ক্লিক করলে প্রথম ধাপে মুরগিকে পাঠানো
+        setTimeout(() => {
+            moveChicken(1); 
+        }, 500);
     }
+}
+
 
     function moveChicken(id) {
     if(!isPlaying || id !== currentStep + 1) return;
