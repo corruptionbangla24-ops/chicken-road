@@ -152,12 +152,27 @@
         }
     }
 
-    function startTraffic(id) {
-        const col = document.getElementById(`col-${id}`);
-        const car = document.getElementById(`car-${id}`);
-        let carPos = -200 - (Math.random() * 500);
-        let speed = 6 + (Math.random() * 8);
-        let barrierActive = false;
+    // startTraffic ফাংশনের ভেতরের এই অংশটুকু পরিবর্তন করুন
+const interval = setInterval(() => {
+    if(!isPlaying) return;
+
+    // ব্যারিয়ার গাড়িকে আটকানোর লজিক
+    // যেহেতু গাড়ি ২৫০ পিক্সেল লম্বা, তাই ব্যারিয়ারের উপরে আটকাতে carPos একটু কমাতে হবে
+    if (barrierActive && carPos >= -50 && carPos <= -20) { 
+        carPos = -40; // গাড়িটি ব্যারিয়ারের ঠিক উপরে এই পজিশনে থেমে থাকবে
+    } else {
+        carPos += speed;
+    }
+
+    if (carPos > gameView.offsetHeight) {
+        carPos = -300; // নতুন করে উপর থেকে আসবে
+        car.src = carImages[Math.floor(Math.random() * 3)];
+    }
+
+    car.style.top = carPos + 'px';
+    checkCollision(id, car, barrierActive);
+}, 30);
+
 
         // ব্যারিয়ার র‍্যান্ডমলি গোপন ও দৃশ্যমান হবে
         setInterval(() => {
