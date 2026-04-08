@@ -28,12 +28,17 @@
         .start-zone { background: rgba(57, 255, 20, 0.05); min-width: 120px; }
 
         /* ট্রাফিক গাড়ি */
-        .traffic-car {
-            position: absolute; width: 75px; height: auto;
-            top: -150px; left: 50%; transform: translateX(-50%);
-            z-index: 5; transition: top 0.04s linear;
-            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
-        }
+.traffic-car {
+    position: absolute; 
+    width: 100%; /* কলামের পুরো চওড়া জায়গা নিবে */
+    height: auto;
+    top: -180px; /* গাড়ি বড় হওয়ায় এটি একটু উপরে সেট করলাম */
+    left: 0;
+    transform: none; /* চওড়া ১০০% হওয়ায় এটি আর দরকার নেই */
+    z-index: 5; 
+    transition: top 0.04s linear;
+}
+
 
         /* গোপন ব্যারিয়ার */
         .barrier-img {
