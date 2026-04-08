@@ -43,16 +43,17 @@
 
 .barrier-img {
     position: absolute; 
-    width: 100%;       /* দুই লাইনের মাঝখানের পুরো জায়গা নিবে */
+    width: 100%;       
     height: 120px; 
     top: 50%; 
-    left: 0;           /* একদম বাম বর্ডার থেকে শুরু হবে */
-    transform: translateY(-50%) scaleX(1); /* মাঝখানে থাকবে কিন্তু ডানে-বামে সরবে না */
-    object-fit: fill;  /* ইমেজটিকে দুই পাশে টেনে বর্ডার পর্যন্ত লাগিয়ে দিবে */
+    left: 0;           /* এটি ব্যারিয়ারকে একদম বামে নিয়ে যাবে */
+    transform: translateY(-50%); /* এটি ব্যারিয়ারকে সঠিক উচ্চতায় রাখবে */
+    object-fit: stretch; /* এটি ইমেজটিকে দুই পাশের বর্ডার পর্যন্ত টেনে বড় করবে */
     opacity: 0; 
     z-index: 10;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
 
 .active-barrier .barrier-img {
     opacity: 1;
