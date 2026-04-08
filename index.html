@@ -103,21 +103,25 @@
         startCol.className = 'road-column';
         gameView.appendChild(startCol);
 
-        for (let i = 1; i <= totalSteps; i++) {
-            const col = document.createElement('div');
-            col.className = 'road-column';
-            col.id = `col-${i}`;
-            let mult = (1 + i * 0.15).toFixed(2);
+   for (let i = 1; i <= totalSteps; i++) {
+    const col = document.createElement('div');
+    col.className = 'road-column';
+    col.id = `col-${i}`;
+    let mult = (1 + i * 0.15).toFixed(2);
 
-            col.innerHTML = `
-                <img src="car.png" class="traffic-car" id="car-${i}" onerror="this.style.display='none'">
-                <img src="barrier.png" class="barrier-img" id="barrier-${i}" onerror="this.style.background='orange'">
-                <div class="multiplier-circle">${mult}x</div>
-            `;
-            gameView.appendChild(col);
-            startTraffic(i);
-        }
-    }
+    // ১ থেকে ৩ এর মধ্যে একটি রেন্ডম সংখ্যা বেছে নিয়ে গাড়ির নাম তৈরি করা
+    let carNumber = Math.floor(Math.random() * 3) + 1; 
+    let carFileName = `car${carNumber}.png`;
+
+    col.innerHTML = `
+        <img src="${carFileName}" class="traffic-car" id="car-${i}">
+        <img src="barrier.png" class="barrier-img" id="barrier-${i}">
+        <div class="multiplier-circle">${mult}x</div>
+    `;
+    gameView.appendChild(col);
+    startTraffic(i);
+}
+
 
     function startTraffic(id) {
         const col = document.getElementById(`col-${id}`);
