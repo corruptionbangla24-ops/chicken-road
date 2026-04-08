@@ -45,13 +45,14 @@
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .active-barrier .barrier-img { opacity: 1; }
+
 #chicken { 
     position: absolute; 
-    width: 280px;      /* মুরগিটিকে আপনার চাহিদা মতো অনেক বড় করা হয়েছে */
+    width: 280px;      /* মুরগিটির রাজকীয় আকার বজায় রাখা হয়েছে */
     height: auto;
-    bottom: 50px;      /* মাল্টিপ্লায়ার লেখার ঠিক উপরে পজিশন করার জন্য */
-    left: 50%;         /* কলামের মাঝখানে নেয়ার প্রথম ধাপ */
-    transform: translateX(-50%); /* মুরগিটিকে কলামের একদম সেন্টারে রাখার জন্য */
+    bottom: 15px;      /* আগে ৫০ ছিল, এখন ১৫ করে মুরগিটিকে অনেকটা নিচে নামানো হয়েছে */
+    left: 50%;         
+    transform: translateX(-50%); 
     z-index: 15;
     transition: left 0.5s ease-in-out; 
     filter: drop-shadow(0 0 15px var(--neon-green));
