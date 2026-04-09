@@ -1,40 +1,42 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - PNG Version</title>
+    <title>Chicken Road - Final Pro</title>
     <style>
         body { margin: 0; background-color: #1a1a1a; color: white; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
         #info { margin-bottom: 10px; font-size: 18px; color: #ffcc00; font-weight: bold; }
 
-        /* গেম এরিয়া */
+        /* গেম এরিয়া (৫টি কলাম) */
         #game-container { position: relative; width: 350px; height: 450px; background: #333; display: flex; border: 4px solid #444; overflow: hidden; border-radius: 10px; }
         
         .column { flex: 1; border-right: 1px dashed #555; position: relative; }
         .column:last-child { border-right: none; }
 
+        /* মাঝখানের সংঘর্ষ রেখা (ঐচ্ছিক, আপনার ড্রয়িং অনুযায়ী বোঝানোর জন্য) */
+        .middle-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.1); }
+
+        /* মুরগি - একদম কলামের মাঝখানে থাকবে */
         #chicken { 
-    position: absolute; 
-    width: 45px; /* সাইজ একটু কমিয়ে দেওয়া হলো যাতে অদৃশ্য অংশ ধাক্কা না খায় */
-    height: auto;
-    bottom: 35px; 
-    left: -80px; 
-    transition: left 0.3s ease-out; 
-    z-index: 10;
-    /* ছবি যাতে কলামের ঠিক মাঝে থাকে */
-    transform: translateX(0); 
-}
+            position: absolute; 
+            width: 50px; 
+            top: 50%; /* কলামের মাঝামাঝি উচ্চতায় */
+            transform: translateY(-50%);
+            left: -80px; 
+            transition: left 0.3s ease-out; 
+            z-index: 10;
+        }
 
-.car { 
-    position: absolute; 
-    width: 45px; /* গাড়ির চওড়া মুরগির সমান রাখা হলো */
-    height: auto; 
-    top: -100px; 
-    z-index: 5; 
-}
-
+        /* গাড়ি */
+        .car { 
+            position: absolute; 
+            width: 60px; 
+            height: 90px; 
+            top: -100px; 
+            z-index: 5; 
+        }
 
         /* কন্ট্রোল প্যানেল */
         #controls { width: 350px; background: #222; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 0 0 10px 10px; box-sizing: border-box; }
@@ -49,10 +51,11 @@
     <div id="info">ব্যালেন্স: $<span id="balance">1000.00</span> | লাভ: <span id="mult">1.00</span>x</div>
 
     <div id="game-container">
+        <div class="middle-line"></div>
         <div class="column"></div>
         <div class="column"></div>
         <div class="column"></div>
-        <div class="column"></div>
+        <div class="column)./div>
         <div class="column"></div>
         
         <img id="chicken" src="chicken.png">
@@ -74,33 +77,29 @@
         const carContainer = document.getElementById("cars-container");
         const carFiles = ["car1.png", "car2.png", "car3.png"];
 
-        // গাড়ি নামানোর লজিক
         function spawnCar(colIndex) {
             const car = document.createElement("img");
-            // ৩টি PNG গাড়ির মধ্য থেকে একটি বেছে নেওয়া
             const randomCar = carFiles[Math.floor(Math.random() * carFiles.length)];
             car.src = randomCar;
             car.className = "car";
-            car.style.left = (colIndex * 70 + 10) + "px"; 
+            car.style.left = (colIndex * 70 + 5) + "px"; 
             carContainer.appendChild(car);
 
             let topPos = -100;
-            let speed = 8; // গাড়ির গতি
+            let speed = 9; // গাড়ি একটু দ্রুত নামবে সংঘর্ষের জন্য
 
             let interval = setInterval(() => {
                 if (isGameOver) { clearInterval(interval); return; }
                 topPos += speed;
                 car.style.top = topPos + "px";
 
-                // কলিশন চেক (ধাক্কা লাগা)
-                // সংঘর্ষ চেক (Collision Detection)
-// মুরগি এবং গাড়ির অবস্থান নিখুঁতভাবে চেক করা
-
-if (currentColumn === colIndex && topPos > 300 && topPos < 340) { 
-    isGameOver = true;
-    alert("ওহ না! মুরগিটি চাপা পড়েছে।");
-    location.reload();
-}
+                // আপনার ড্রয়িং অনুযায়ী কলামের ঠিক মাঝামাঝি উচ্চতায় সংঘর্ষ চেক
+                // যেহেতু মুরগি মাঝখানে (top: 200px), তাই গাড়ি ১১০ থেকে ২১০ এর মধ্যে আসলে ধাক্কা লাগবে
+                if (currentColumn === colIndex && topPos > 110 && topPos < 210) {
+                    isGameOver = true;
+                    alert("সংঘর্ষ হয়েছে! মুরগিটি মাঝপথে চাপা পড়েছে।");
+                    location.reload(); 
+                }
 
                 if (topPos > 450) {
                     car.remove();
@@ -109,39 +108,32 @@ if (currentColumn === colIndex && topPos > 300 && topPos < 340) {
             }, 30);
         }
 
-        // GO বাটনের কাজ
         function nextStep() {
-    if (isGameOver) return;
-    currentColumn++;
-    
-    if (currentColumn >= 5) {
-        alert("বিজয়! আপনি সফলভাবে রাস্তা পার হয়েছেন।");
-        cashOut();
-        return;
-    }
+            if (isGameOver) return;
+            currentColumn++;
+            
+            if (currentColumn >= 5) {
+                alert("রাস্তা পার হওয়া সফল!");
+                cashOut();
+                return;
+            }
 
-    // মুরগিটিকে কলামের একদম মাঝখানে বসানোর লজিক
-    let centerX = (currentColumn * 70) + 12; 
-    chicken.style.left = centerX + "px";
+            // মুরগি কলামের মাঝখানে পজিশন নেওয়া
+            let centerX = (currentColumn * 70) + 10; 
+            chicken.style.left = centerX + "px";
 
-    // লাফ দেওয়ার ইফেক্ট
-    chicken.style.transform = "scale(1.2)";
-    setTimeout(() => { chicken.style.transform = "scale(1)"; }, 200);
+            spawnCar(currentColumn);
 
-    spawnCar(currentColumn);
-
-    // লাভ বা মাল্টিপ্লায়ার আপডেট
-    multiplier += 0.50;
-    document.getElementById("mult").innerText = multiplier.toFixed(2);
-}
-
+            multiplier += 0.50;
+            document.getElementById("mult").innerText = multiplier.toFixed(2);
+        }
 
         function cashOut() {
             if (currentColumn === -1 || isGameOver) return;
             let win = 10 * multiplier;
             balance += win;
-            document.getElementById("balance").innerText = balance.toFixed(2);
-            alert("আপনি জিতেছেন: $" + win.toFixed(2));
+            document.getElementById("money").innerText = balance.toFixed(2);
+            alert("জিতেছেন: $" + win.toFixed(2));
             resetRound();
         }
 
@@ -155,4 +147,3 @@ if (currentColumn === colIndex && topPos > 300 && topPos < 340) {
     </script>
 </body>
 </html>
-    
