@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - Multi Car Version</title>
+    <title>Chicken Road - Column Version</title>
     <style>
         body { margin: 0; background-color: #1a1a1a; color: white; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
         #game-container { position: relative; width: 350px; height: 400px; background: #333; display: flex; border: 4px solid #444; margin-top: 20px; overflow: hidden; }
@@ -23,14 +23,14 @@
     <div id="info">ব্যালেন্স: $<span id="balance">0.00</span> | লাভ: <span id="mult">1.00</span>x</div>
 
     <div id="game-container">
-        <!-- ৫টি কলাম বা রাস্তা -->
         <div class="column"></div>
         <div class="column"></div>
         <div class="column"></div>
         <div class="column"></div>
         <div class="column"></div>
         
-        <img id="chicken" src="chicken.png" style="left: -60px;"> 
+        <!-- মুরগির ফাইলের নাম এখানে chicken.jpg করা হয়েছে -->
+        <img id="chicken" src="chicken.jpg" style="left: -60px;"> 
         <div id="cars-container"></div>
     </div>
 
@@ -49,29 +49,24 @@
         const chicken = document.getElementById("chicken");
         const carContainer = document.getElementById("cars-container");
         
-        // ৩টি গাড়ির নাম
         const carFiles = ["car1.png", "car2.png", "car3.png"];
 
         function spawnCar(colIndex) {
             const car = document.createElement("img");
-            
-            // র্যান্ডমলি একটি গাড়ি সিলেক্ট করা
             const randomCar = carFiles[Math.floor(Math.random() * carFiles.length)];
             car.src = randomCar;
-            
             car.className = "car";
             car.style.left = (colIndex * 70 + 12) + "px"; 
             carContainer.appendChild(car);
 
             let topPos = -80;
-            let speed = 6 + Math.random() * 4; // গাড়ির গতি একটু র্যান্ডম রাখা হলো
+            let speed = 7; // গাড়ির গতি
 
             let interval = setInterval(() => {
                 if (isGameOver) { clearInterval(interval); return; }
                 topPos += speed;
                 car.style.top = topPos + "px";
 
-                // সংঘর্ষ পরীক্ষা (Collision Detection)
                 if (currentColumn === colIndex && topPos > 270 && topPos < 350) {
                     gameOver();
                     clearInterval(interval);
@@ -86,49 +81,38 @@
 
         function nextStep() {
             if (isGameOver) return;
-
             currentColumn++;
             if (currentColumn >= 5) {
-                alert("সব বাধা পার হয়েছেন! অভিনন্দন।");
+                alert("বিজয়! আপনি সফলভাবে রাস্তা পার হয়েছেন।");
                 cashOut();
                 return;
             }
-
-            // মুরগি পরের কলামে যাবে
             chicken.style.left = (currentColumn * 70 + 12) + "px";
             chicken.style.bottom = "40px";
-
-            // ওই কলামে র্যান্ডম গাড়ি নামানো
             spawnCar(currentColumn);
-
-            // লাভ বা মাল্টিপ্লায়ার আপডেট
-            multiplier += 0.65;
+            multiplier += 0.50;
             document.getElementById("mult").innerText = multiplier.toFixed(2);
         }
 
         function gameOver() {
             isGameOver = true;
-            alert("গাড়ি মুরগিকে চাপা দিয়েছে! আপনার বাজি লস হয়েছে।");
-            resetRound();
+            alert("গেম ওভার! মুরগিটি গাড়ির নিচে পড়েছে।");
             location.reload(); 
         }
 
         function cashOut() {
             if (currentColumn === -1 || isGameOver) return;
-            let win = bet * multiplier;
-            balance += win;
+            balance += bet * multiplier;
             document.getElementById("balance").innerText = balance.toFixed(2);
-            alert("আপনি ক্যাশ আউট করেছেন: $" + win.toFixed(2));
+            alert("আপনি জিতেছেন: $" + (bet * multiplier).toFixed(2));
             resetRound();
         }
 
         function resetRound() {
             currentColumn = -1;
             multiplier = 1.0;
-            isGameOver = false;
             chicken.style.left = "-60px";
             document.getElementById("mult").innerText = "1.00";
-            carContainer.innerHTML = ""; 
         }
     </script>
 </body>
