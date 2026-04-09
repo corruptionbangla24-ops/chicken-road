@@ -15,24 +15,26 @@
         .column { flex: 1; border-right: 1px dashed #555; position: relative; }
         .column:last-child { border-right: none; }
 
-        /* মুরগি */
         #chicken { 
-            position: absolute; 
-            width: 55px; 
-            bottom: 30px; 
-            left: -80px; 
-            transition: left 0.3s ease-out, transform 0.2s; 
-            z-index: 10;
-        }
+    position: absolute; 
+    width: 45px; /* সাইজ একটু কমিয়ে দেওয়া হলো যাতে অদৃশ্য অংশ ধাক্কা না খায় */
+    height: auto;
+    bottom: 35px; 
+    left: -80px; 
+    transition: left 0.3s ease-out; 
+    z-index: 10;
+    /* ছবি যাতে কলামের ঠিক মাঝে থাকে */
+    transform: translateX(0); 
+}
 
-        /* গাড়ি */
-        .car { 
-            position: absolute; 
-            width: 50px; 
-            height: 80px; 
-            top: -100px; 
-            z-index: 5; 
-        }
+.car { 
+    position: absolute; 
+    width: 45px; /* গাড়ির চওড়া মুরগির সমান রাখা হলো */
+    height: auto; 
+    top: -100px; 
+    z-index: 5; 
+}
+
 
         /* কন্ট্রোল প্যানেল */
         #controls { width: 350px; background: #222; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 0 0 10px 10px; box-sizing: border-box; }
@@ -91,11 +93,14 @@
                 car.style.top = topPos + "px";
 
                 // কলিশন চেক (ধাক্কা লাগা)
-                if (currentColumn === colIndex && topPos > 280 && topPos < 370) {
-                    isGameOver = true;
-                    alert("ওহ না! মুরগিটি চাপা পড়েছে। গেম শেষ।");
-                    location.reload(); // গেম রিস্টার্ট
-                }
+                // সংঘর্ষ চেক (Collision Detection)
+// মুরগি এবং গাড়ির অবস্থান নিখুঁতভাবে চেক করা
+
+if (currentColumn === colIndex && topPos > 300 && topPos < 340) { 
+    isGameOver = true;
+    alert("ওহ না! মুরগিটি চাপা পড়েছে।");
+    location.reload();
+}
 
                 if (topPos > 450) {
                     car.remove();
@@ -106,27 +111,30 @@
 
         // GO বাটনের কাজ
         function nextStep() {
-            if (isGameOver) return;
-            currentColumn++;
-            
-            if (currentColumn >= 5) {
-                alert("রাস্তা পার হওয়া সফল! বিজয়!");
-                cashOut();
-                return;
-            }
+    if (isGameOver) return;
+    currentColumn++;
+    
+    if (currentColumn >= 5) {
+        alert("বিজয়! আপনি সফলভাবে রাস্তা পার হয়েছেন।");
+        cashOut();
+        return;
+    }
 
-            // মুরগি এক কলাম ডানে যাবে এবং একটু লাফ দিবে
-            chicken.style.left = (currentColumn * 70 + 8) + "px";
-            chicken.style.transform = "scale(1.2)";
-            setTimeout(() => { chicken.style.transform = "scale(1)"; }, 200);
+    // মুরগিটিকে কলামের একদম মাঝখানে বসানোর লজিক
+    let centerX = (currentColumn * 70) + 12; 
+    chicken.style.left = centerX + "px";
 
-            // ওই কলামে গাড়ি নামানো
-            spawnCar(currentColumn);
+    // লাফ দেওয়ার ইফেক্ট
+    chicken.style.transform = "scale(1.2)";
+    setTimeout(() => { chicken.style.transform = "scale(1)"; }, 200);
 
-            // মাল্টিপ্লায়ার বা লাভ আপডেট
-            multiplier += 0.50;
-            document.getElementById("mult").innerText = multiplier.toFixed(2);
-        }
+    spawnCar(currentColumn);
+
+    // লাভ বা মাল্টিপ্লায়ার আপডেট
+    multiplier += 0.50;
+    document.getElementById("mult").innerText = multiplier.toFixed(2);
+}
+
 
         function cashOut() {
             if (currentColumn === -1 || isGameOver) return;
