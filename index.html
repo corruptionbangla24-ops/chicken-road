@@ -12,24 +12,22 @@
         
         /* মুরগির কন্টেইনার ফিক্স */
         #chicken-box { 
-            position: absolute; 
-            width: 60px; height: 60px; /* সাইজ বাড়ানো হয়েছে */
-            overflow: hidden; 
-            bottom: 30px; 
-            left: 10px; 
-            transition: left 0.4s ease;
-            z-index: 10;
-            /* সাদা ব্যাকগ্রাউন্ড রিমুভ করার জন্য ফিল্টার */
-            filter: multiply(1); 
-            mix-blend-mode: multiply; /* ডার্ক ব্যাকগ্রাউন্ডে সাদা রিমুভ করতে এটি বেশি কার্যকর */
-        }
+    position: absolute; 
+    width: 60px; height: 60px; 
+    overflow: hidden; 
+    bottom: 30px; 
+    left: 10px; 
+    transition: left 0.4s ease;
+    z-index: 10;
+    /* এই অংশগুলো বাদ দিন: mix-blend-mode এবং filter */
+}
 
-        #chicken-img { 
-            position: absolute; 
-            width: 480px; height: 60px; /* ৮টি ফ্রেম (৬০x৮) */
-            left: 0;
-            image-rendering: pixelated; /* পিক্সেল ছবি স্পষ্ট দেখাবে */
-        }
+#chicken-img { 
+    position: absolute; 
+    width: 480px; height: 60px; 
+    left: 0;
+    image-rendering: pixelated; 
+}
 
         .car { position: absolute; width: 50px; height: 80px; top: -100px; z-index: 5; }
         #controls { width: 350px; background: #222; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 0 0 10px 10px; box-sizing: border-box; }
