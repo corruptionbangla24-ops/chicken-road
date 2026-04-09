@@ -29,10 +29,24 @@
         }
         
         .barrier-img { 
-            position: absolute; width: 100%; height: 60px; top: 45%; left: 0; 
-            background: rgba(243, 156, 18, 0.6); display: none; z-index: 10; 
-        }
-        .active-barrier .barrier-img { display: block; }
+    position: absolute; 
+    width: 100%; 
+    height: 60px; 
+    top: 45%; 
+    left: 0; 
+    z-index: 10; 
+    display: none; /* শুরুতে লুকানো থাকবে */
+    
+    /* যদি ছবি লোড না হয় তবে নিচের কালারটি দেখাবে */
+    background-color: rgba(243, 156, 18, 0.8); 
+    border-top: 4px solid #f39c12;
+    border-bottom: 4px solid #f39c12;
+}
+
+/* যখন এই ক্লাসটি যোগ হবে তখনই বেরিয়ার দেখা যাবে */
+.active-barrier .barrier-img { 
+    display: block !important; 
+}
 
         .multiplier-circle {
             position: absolute; width: 60px; height: 60px; border-radius: 50%;
@@ -114,12 +128,16 @@
             
             // রেন্ডম গাড়ি ইমেজ সিলেক্ট
             let carNum = Math.floor(Math.random() * 3) + 1;
+col.innerHTML = `
+    <img src="car${carNum}.png" class="traffic-car" id="car-${i}" alt="🚗" onerror="this.style.background='red'">
+    
+    <!-- বেরিয়ার ইমেজ এখানে যোগ করা হলো -->
+    <img src="barrier.png" class="barrier-img" id="barrier-${i}" onerror="this.style.display='block'; this.style.background='orange';">
+    
+    <div class="multiplier-circle">${mult}x</div>
+`;
 
-            col.innerHTML = `
-                <img src="car${carNum}.png" class="traffic-car" id="car-${i}" alt="🚗" onerror="this.style.background='red'">
-                <div class="barrier-img" id="barrier-${i}"></div>
-                <div class="multiplier-circle">${mult}x</div>
-            `;
+            
             gameView.appendChild(col);
             startTraffic(i);
         }
