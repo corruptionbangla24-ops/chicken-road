@@ -211,20 +211,29 @@ col.innerHTML = `
     }
 
     function checkCollision(id, car, barrierActive) {
-        const chicken = document.getElementById('chicken');
-        if(!isPlaying || currentStep !== id || barrierActive) return;
+    const chicken = document.getElementById('chicken');
+    
+    // ১. যদি খেলা না চলে, অথবা মুরগি অন্য কলামে থাকে, তবে চেক করার দরকার নেই
+    if(!isPlaying || currentStep !== id) return;
 
-        const cRect = chicken.getBoundingClientRect();
-        const carRect = car.getBoundingClientRect();
-
-        // সহজ কোলিশন চেক
-        if (cRect.left < carRect.right &&
-            cRect.right > carRect.left &&
-            cRect.top < carRect.bottom &&
-            cRect.bottom > carRect.top) {
-            gameOver();
-        }
+    // ২. সবচেয়ে গুরুত্বপূর্ণ: যদি ব্যারিয়ার সক্রিয় থাকে, তবে গাড়ি মুরগির ক্ষতি করতে পারবে না
+    // এখানে return করে দিলে মুরগি নিরাপদ থাকবে
+    if (barrierActive) {
+        return; 
     }
+
+    const cRect = chicken.getBoundingClientRect();
+    const carRect = car.getBoundingClientRect();
+
+    // ৩. কোলিশন লজিক (ব্যারিয়ার না থাকলেই কেবল এটি কাজ করবে)
+    if (cRect.left < carRect.right &&
+        cRect.right > carRect.left &&
+        cRect.top < carRect.bottom &&
+        cRect.bottom > carRect.top) {
+        gameOver();
+    }
+}
+
 
     function gameOver() {
         isPlaying = false;
