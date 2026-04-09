@@ -158,20 +158,26 @@ col.innerHTML = `
         }, 2500);
 
         // গাড়ি চলার লজিক
-        const cInt = setInterval(() => {
-            if(!isPlaying) return;
+        // গাড়ি চলার লজিক (Line 161 - 168)
+const cInt = setInterval(() => {
+    if(!isPlaying) return;
 
-            if (barrierActive && carPos >= 100 && carPos <= 140) {
-                carPos = 120; // ব্যারিয়ার থাকলে গাড়ি থেমে থাকবে
-            } else {
-                carPos += speed;
-            }
+    // বেরিয়ার সক্রিয় থাকলে এবং গাড়ি বেরিয়ারের কাছে পৌঁছালে সেটি আর নড়বে না
+    if (barrierActive && carPos >= 80 && carPos <= 120) {
+        carPos = 100; // বেরিয়ারের সামনে গাড়ি লক হয়ে যাবে
+    } else {
+        carPos += speed;
+    }
 
-            if (carPos > gameView.offsetHeight) carPos = -200;
-            car.style.top = carPos + 'px';
+    if (carPos > gameView.offsetHeight) carPos = -200;
+    car.style.top = carPos + 'px';
 
-            checkCollision(id, car, barrierActive);
-        }, 30);
+    // বেরিয়ার থাকলে মুরগি ১০০% নিরাপদ, কোনো চেক হবে না
+    if (!barrierActive) {
+        checkCollision(id, car, barrierActive);
+    }
+}, 30);
+
 
         carIntervals.push(bInt, cInt);
     }
