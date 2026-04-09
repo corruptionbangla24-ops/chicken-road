@@ -3,38 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - Animated Version</title>
+    <title>Chicken Road - Final Fixed</title>
     <style>
         body { margin: 0; background-color: #1a1a1a; color: white; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        
         #info { margin-top: 10px; font-size: 18px; color: #ffcc00; font-weight: bold; }
-
         #game-container { position: relative; width: 350px; height: 400px; background: #333; display: flex; border: 4px solid #444; margin-top: 20px; overflow: hidden; }
-        
         .column { flex: 1; border-right: 1px dashed #555; position: relative; }
-        .column:last-child { border-right: none; }
-
-        /* অ্যানিমেটেড মুরগির কন্টেইনার */
+        
+        /* মুরগির কন্টেইনার এবং ব্যাকগ্রাউন্ড রিমুভ লজিক */
         #chicken-box { 
             position: absolute; 
-            width: 48px; /* একটি মুরগির চওড়া */
-            height: 48px; 
-            overflow: hidden; /* বাকি ফ্রেমগুলো লুকিয়ে রাখবে */
+            width: 48px; height: 48px; 
+            overflow: hidden; 
             bottom: 20px; 
-            left: -60px; 
-            transition: left 0.3s ease;
+            left: 10px; /* শুরুতে বামে এক জায়গায় থাকবে */
+            transition: left 0.4s ease;
             z-index: 10;
+            mix-blend-mode: screen; /* এটি সাদা ব্যাকগ্রাউন্ড রিমুভ করতে সাহায্য করবে */
         }
 
         #chicken-img { 
             position: absolute; 
-            width: 384px; /* ৮টি ফ্রেমের মোট চওড়া (৪৮ x ৮) */
-            height: 48px; 
+            width: 384px; height: 48px; 
             left: 0;
         }
 
         .car { position: absolute; width: 45px; height: 70px; top: -80px; z-index: 5; }
-
         #controls { width: 350px; background: #222; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 0 0 10px 10px; box-sizing: border-box; }
         button { padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; }
         .btn-go { background: #28a745; color: white; }
@@ -67,85 +61,68 @@
         let currentColumn = -1;
         let multiplier = 1.0;
         let balance = 0;
-        let bet = 10;
         let isGameOver = false;
         let frame = 0;
 
         const chickenBox = document.getElementById("chicken-box");
         const chickenImg = document.getElementById("chicken-img");
         const carContainer = document.getElementById("cars-container");
-        const carFiles = ["car1.png", "car2.png", "car3.png"];
 
-        // ১. মুরগির অ্যানিমেশন লজিক
         function animateChicken() {
-            frame = (frame + 1) % 8; // ৮টি ফ্রেম ঘুরবে
+            frame = (frame + 1) % 8;
             chickenImg.style.left = -(frame * 48) + "px";
         }
-        setInterval(animateChicken, 100); // প্রতি ০.১ সেকেন্ডে ফ্রেম বদলাবে
+        setInterval(animateChicken, 100);
 
-        // ২. গাড়ি নামানোর লজিক
         function spawnCar(colIndex) {
             const car = document.createElement("img");
-            const randomCar = carFiles[Math.floor(Math.random() * carFiles.length)];
-            car.src = randomCar;
+            car.src = "car1.png"; // আপনার কার ফাইলের নাম ঠিক রাখুন
             car.className = "car";
             car.style.left = (colIndex * 70 + 12) + "px"; 
             carContainer.appendChild(car);
 
             let topPos = -80;
-            let speed = 7;
-
             let interval = setInterval(() => {
                 if (isGameOver) { clearInterval(interval); return; }
-                topPos += speed;
+                topPos += 7;
                 car.style.top = topPos + "px";
 
-                // সংঘর্ষ চেক
-                const chickenLeft = currentColumn * 70 + 12;
                 if (currentColumn === colIndex && topPos > 280 && topPos < 350) {
-                    gameOver();
+                    alert("গেম ওভার!");
+                    location.reload();
                     clearInterval(interval);
                 }
-
                 if (topPos > 400) { car.remove(); clearInterval(interval); }
             }, 30);
         }
 
-        // ৩. GO বাটন
         function nextStep() {
             if (isGameOver) return;
             currentColumn++;
             if (currentColumn >= 5) {
-                alert("রাস্তা পার হওয়া শেষ! ক্যাশ আউট করুন।");
+                alert("রাস্তা পার হয়েছেন!");
                 cashOut();
                 return;
             }
+            // মুরগিটি মেইন কন্টেইনার থেকে বের হয়ে কলামে যাবে
             chickenBox.style.left = (currentColumn * 70 + 12) + "px";
             spawnCar(currentColumn);
             multiplier += 0.50;
             document.getElementById("mult").innerText = multiplier.toFixed(2);
         }
 
-        function gameOver() {
-            isGameOver = true;
-            alert("গেম ওভার!");
-            location.reload();
-        }
-
         function cashOut() {
-            if (currentColumn === -1 || isGameOver) return;
-            balance += bet * multiplier;
+            if (currentColumn === -1) return;
+            balance += 10 * multiplier;
             document.getElementById("balance").innerText = balance.toFixed(2);
-            alert("জিতেছেন: $" + (bet * multiplier).toFixed(2));
-            resetRound();
-        }
-
-        function resetRound() {
+            alert("জিতেছেন: $" + (10 * multiplier).toFixed(2));
             currentColumn = -1;
             multiplier = 1.0;
-            chickenBox.style.left = "-60px";
+            chickenBox.style.left = "10px";
             document.getElementById("mult").innerText = "1.00";
         }
     </script>
 </body>
 </html>
+            
+            
