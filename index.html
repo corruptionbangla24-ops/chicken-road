@@ -1,138 +1,142 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - Infinite Version</title>
+    <title>Chicken Road - Pro Edition</title>
     <style>
-        body { margin: 0; background-color: #1a1a1a; color: white; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        body { margin: 0; background-color: #1a1a1a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; }
         
-        #info { margin-bottom: 10px; font-size: 18px; color: #ffcc00; font-weight: bold; position: fixed; top: 20px; z-index: 100; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
+        header { width: 100%; max-width: 360px; display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #222; box-sizing: border-box; }
+        .balance-box { background: #333; padding: 5px 12px; border-radius: 15px; color: #ffcc00; font-weight: bold; }
+        .nav-links { display: flex; gap: 12px; font-size: 11px; text-transform: uppercase; }
+        .nav-links span { cursor: pointer; color: #888; border-bottom: 1px solid #555; }
 
-        /* ভিউপোর্ট - যেখানে গেম দেখা যাবে */
-        #viewport { position: relative; width: 300px; height: 450px; background: #333; border: 4px solid #444; overflow: hidden; border-radius: 10px; }
-
-        /* গেম ওয়ার্ল্ড - যা বাম দিকে সরবে */
-        #game-world { position: absolute; display: flex; top: 0; left: 0; height: 100%; transition: transform 0.4s ease-out; }
+        #viewport { position: relative; width: 340px; height: 450px; background: #333; border: 3px solid #444; overflow: hidden; margin-top: 10px; border-radius: 10px; }
+        #game-world { position: absolute; display: flex; top: 0; left: 0; height: 100%; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         
-        .column { width: 60px; height: 100%; border-right: 1px dashed #555; position: relative; flex-shrink: 0; box-sizing: border-box; }
+        .column { width: 68px; height: 100%; border-right: 1px solid #444; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .first-col { background-color: #2c3e50; } 
 
-        /* মুরগি ও গাড়ি */
-        #chicken { position: absolute; width: 45px; top: 50%; transform: translateY(-50%); left: 7.5px; z-index: 10; transition: transform 0.2s; }
-        .car { position: absolute; width: 55px; height: 85px; top: -100px; z-index: 5; left: 2.5px; }
+        .bubble { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #ffcc00; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #ffcc00; background: rgba(0,0,0,0.4); z-index: 2; }
 
-        /* কন্ট্রোল প্যানেল */
-        #controls { width: 300px; background: #222; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 0 0 10px 10px; box-sizing: border-box; margin-top: -4px; z-index: 100; }
-        button { padding: 18px; font-size: 16px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; }
+        #chicken { position: absolute; width: 45px; top: 50%; transform: translateY(-50%); left: 10px; z-index: 10; transition: left 0.3s; }
+        .car { position: absolute; width: 50px; height: 85px; top: -100px; z-index: 5; }
+
+        #controls { width: 340px; background: #222; padding: 15px; border-radius: 0 0 10px 10px; box-sizing: border-box; }
+        .diff-select { width: 100%; padding: 12px; background: #333; color: white; border: 1px solid #444; border-radius: 5px; margin-bottom: 12px; font-size: 14px; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 16px; font-size: 15px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
         .btn-go { background: #28a745; color: white; }
         .btn-cash { background: #f3c11a; color: black; }
+        button:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
 
-    <div id="info">ব্যালেন্স: $<span id="balance">1000.00</span> | লাভ: <span id="mult">1.00</span>x</div>
+    <header>
+        <div style="font-weight: bold; letter-spacing: 1px; font-size: 13px;">CHICKEN ROAD</div>
+        <div class="balance-box">$ <span id="balance">1000.00</span></div>
+        <div class="nav-links">
+            <span onclick="alert('History is empty')">History</span>
+            <span id="sound-btn" onclick="toggleSound()">Sound: ON</span>
+        </div>
+    </header>
 
     <div id="viewport">
         <div id="game-world">
-            <!-- মুরগি এই ওয়ার্ল্ডের ভেতরে থাকবে -->
+            <div class="column first-col">
+                <span style="font-size: 9px; position: absolute; top: 20%; color: #666; font-weight: bold;">SAFE ZONE</span>
+            </div> 
             <img id="chicken" src="chicken.png">
-            <!-- কলামগুলো এখানে অটোমেটিক তৈরি হবে -->
         </div>
     </div>
 
     <div id="controls">
-        <button class="btn-cash" onclick="cashOut()">CASH OUT</button>
-        <button class="btn-go" onclick="nextStep()">GO</button>
+        <select class="diff-select" id="difficulty">
+            <option value="medium">MEDIUM MODE</option>
+            <option value="hard">HARD MODE</option>
+        </select>
+        <div class="btn-group">
+            <button class="btn-cash" onclick="cashOut()">Cash Out</button>
+            <button class="btn-go" onclick="nextStep()">GO</button>
+        </div>
     </div>
 
     <script>
-        let currentStep = -1;
-        let multiplier = 1.0;
-        let balance = 1000.00;
-        let bet = 10;
+        let currentStep = 0;
+        let totalBalance = 1000;
+        let currentMultiplier = 1.0;
         let isGameOver = false;
-        const maxMultiplier = 20000;
+        let soundOn = true;
 
         const world = document.getElementById("game-world");
         const chicken = document.getElementById("chicken");
-        const carFiles = ["car1.png", "car2.png", "car3.png"];
 
-        // শুরুতে কিছু কলাম তৈরি করে রাখা
-        for (let i = 0; i < 10; i++) {
-            createColumn();
+        function generateColumns(count) {
+            for (let i = 1; i <= count; i++) {
+                let col = document.createElement("div");
+                col.className = "column";
+                let val = (1 + (i * 0.13)).toFixed(2); 
+                col.innerHTML = `<div class="bubble">${val}x</div>`;
+                world.appendChild(col);
+            }
+        }
+        generateColumns(100); 
+
+        function nextStep() {
+            if (isGameOver) return;
+            currentStep++;
+            
+            let offset = (currentStep * 68);
+            world.style.transform = `translateX(-${offset}px)`;
+            chicken.style.left = (offset + 10) + "px";
+
+            spawnCar(currentStep);
+            currentMultiplier = (1 + (currentStep * 0.13)).toFixed(2);
         }
 
-        function createColumn() {
-            const col = document.createElement("div");
-            col.className = "column";
-            world.appendChild(col);
-        }
-
-        function spawnCar(stepIndex) {
+        function spawnCar(step) {
             const car = document.createElement("img");
-            const randomCar = carFiles[Math.floor(Math.random() * carFiles.length)];
-            car.src = randomCar;
+            const carId = Math.floor(Math.random() * 3) + 1;
+            car.src = `car${carId}.png`;
             car.className = "car";
             
-            // নির্দিষ্ট কলামের ভেতরে গাড়িটি ঢোকানো
-            const targetCol = world.children[stepIndex + 1]; // +1 কারণ chicken একটি এলিমেন্ট
+            const targetCol = world.children[step + 1]; 
             targetCol.appendChild(car);
 
             let topPos = -100;
-            let speed = 9 + (multiplier / 100); // যেমন এগোবেন গাড়িও তেমন দ্রুত হবে
+            let speed = document.getElementById("difficulty").value === "hard" ? 13 : 9;
 
             let interval = setInterval(() => {
                 if (isGameOver) { clearInterval(interval); return; }
                 topPos += speed;
                 car.style.top = topPos + "px";
 
-                // সংঘর্ষ চেক
-                if (currentStep === stepIndex && topPos > 110 && topPos < 210) {
+                if (topPos > 185 && topPos < 255) { 
                     isGameOver = true;
-                    alert("ওহ না! ২০০০০x এর স্বপ্নে বাধা দিল গাড়ি।");
+                    alert("GAME OVER! Multiplier: " + currentMultiplier + "x");
                     location.reload();
                 }
 
-                if (topPos > 500) {
+                if (topPos > 460) {
                     car.remove();
                     clearInterval(interval);
                 }
             }, 30);
         }
 
-        function nextStep() {
-            if (isGameOver || multiplier >= maxMultiplier) return;
-
-            currentStep++;
-            
-            // আনলিমিটেড কলাম তৈরি
-            if (currentStep + 5 >= world.children.length) {
-                createColumn();
-            }
-
-            // ক্যামেরা স্ক্রলিং (ডান থেকে বামে)
-            const offset = currentStep * 60;
-            world.style.transform = `translateX(-${offset}px)`;
-            
-            // মুরগির পজিশন আপডেট (ভিজুয়ালি মুরগি এক জায়গায় থাকবে, কলাম সরবে)
-            chicken.style.left = (offset + 7.5) + "px";
-
-            // ওই কলামে গাড়ি নামানো
-            spawnCar(currentStep);
-
-            // মাল্টিপ্লায়ার আপডেট
-            if (multiplier < maxMultiplier) {
-                multiplier += 0.50; 
-                document.getElementById("mult").innerText = multiplier.toFixed(2);
-            }
+        function toggleSound() {
+            soundOn = !soundOn;
+            document.getElementById("sound-btn").innerText = "Sound: " + (soundOn ? "ON" : "OFF");
         }
 
         function cashOut() {
-            if (currentStep === -1 || isGameOver) return;
-            let win = bet * multiplier;
-            balance += win;
-            document.getElementById("balance").innerText = balance.toFixed(2);
-            alert("অভিনন্দন! আপনি জিতেছেন: $" + win.toFixed(2));
+            if (currentStep === 0 || isGameOver) return;
+            let win = 10 * currentMultiplier; 
+            totalBalance += win;
+            document.getElementById("balance").innerText = totalBalance.toFixed(2);
+            alert("CONGRATS! You won: $" + win.toFixed(2));
             location.reload();
         }
     </script>
