@@ -3,59 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - Narrow Columns</title>
+    <title>Chicken Road - Infinite Version</title>
     <style>
         body { margin: 0; background-color: #1a1a1a; color: white; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
-        #info { margin-bottom: 10px; font-size: 18px; color: #ffcc00; font-weight: bold; }
+        #info { margin-bottom: 10px; font-size: 18px; color: #ffcc00; font-weight: bold; position: fixed; top: 20px; z-index: 100; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
 
-        /* গেম এরিয়া - চওড়া ৩০০px করা হয়েছে (প্রতি কলাম ৬০px) */
-        #game-container { position: relative; width: 300px; height: 450px; background: #333; display: flex; border: 4px solid #444; overflow: hidden; border-radius: 10px; }
+        /* ভিউপোর্ট - যেখানে গেম দেখা যাবে */
+        #viewport { position: relative; width: 300px; height: 450px; background: #333; border: 4px solid #444; overflow: hidden; border-radius: 10px; }
+
+        /* গেম ওয়ার্ল্ড - যা বাম দিকে সরবে */
+        #game-world { position: absolute; display: flex; top: 0; left: 0; height: 100%; transition: transform 0.4s ease-out; }
         
-        .column { flex: 1; border-right: 1px dashed #555; position: relative; }
-        .column:last-child { border-right: none; }
+        .column { width: 60px; height: 100%; border-right: 1px dashed #555; position: relative; flex-shrink: 0; box-sizing: border-box; }
 
-        /* মুরগি - কলাম অনুযায়ী সাইজ সমন্বয় */
-        #chicken { 
-            position: absolute; 
-            width: 45px; 
-            top: 50%; 
-            transform: translateY(-50%);
-            left: -60px; 
-            transition: left 0.3s ease-out; 
-            z-index: 10;
-        }
+        /* মুরগি ও গাড়ি */
+        #chicken { position: absolute; width: 45px; top: 50%; transform: translateY(-50%); left: 7.5px; z-index: 10; transition: transform 0.2s; }
+        .car { position: absolute; width: 55px; height: 85px; top: -100px; z-index: 5; left: 2.5px; }
 
-        /* গাড়ি - কলাম অনুযায়ী সাইজ সমন্বয় */
-        .car { 
-            position: absolute; 
-            width: 55px; 
-            height: 85px; 
-            top: -100px; 
-            z-index: 5; 
-        }
-
-        /* কন্ট্রোল প্যানেল - চওড়া ৩০০px */
-        #controls { width: 300px; background: #222; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 0 0 10px 10px; box-sizing: border-box; }
+        /* কন্ট্রোল প্যানেল */
+        #controls { width: 300px; background: #222; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 0 0 10px 10px; box-sizing: border-box; margin-top: -4px; z-index: 100; }
         button { padding: 18px; font-size: 16px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; }
         .btn-go { background: #28a745; color: white; }
         .btn-cash { background: #f3c11a; color: black; }
-        button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
     <div id="info">ব্যালেন্স: $<span id="balance">1000.00</span> | লাভ: <span id="mult">1.00</span>x</div>
 
-    <div id="game-container">
-        <div class="column"></div>
-        <div class="column"></div>
-        <div class="column"></div>
-        <div class="column"></div>
-        <div class="column"></div>
-        
-        <img id="chicken" src="chicken.png">
-        <div id="cars-container"></div>
+    <div id="viewport">
+        <div id="game-world">
+            <!-- মুরগি এই ওয়ার্ল্ডের ভেতরে থাকবে -->
+            <img id="chicken" src="chicken.png">
+            <!-- কলামগুলো এখানে অটোমেটিক তৈরি হবে -->
+        </div>
     </div>
 
     <div id="controls">
@@ -64,41 +46,54 @@
     </div>
 
     <script>
-        let currentColumn = -1;
+        let currentStep = -1;
         let multiplier = 1.0;
         let balance = 1000.00;
+        let bet = 10;
         let isGameOver = false;
+        const maxMultiplier = 20000;
 
+        const world = document.getElementById("game-world");
         const chicken = document.getElementById("chicken");
-        const carContainer = document.getElementById("cars-container");
         const carFiles = ["car1.png", "car2.png", "car3.png"];
 
-        function spawnCar(colIndex) {
+        // শুরুতে কিছু কলাম তৈরি করে রাখা
+        for (let i = 0; i < 10; i++) {
+            createColumn();
+        }
+
+        function createColumn() {
+            const col = document.createElement("div");
+            col.className = "column";
+            world.appendChild(col);
+        }
+
+        function spawnCar(stepIndex) {
             const car = document.createElement("img");
             const randomCar = carFiles[Math.floor(Math.random() * carFiles.length)];
             car.src = randomCar;
             car.className = "car";
             
-            // প্রতিটি কলাম ৬০px, গাড়ি ৫৫px, তাই ২.৫px ফাঁকা রেখে মাঝখানে বসানো
-            car.style.left = (colIndex * 60 + 2.5) + "px"; 
-            carContainer.appendChild(car);
+            // নির্দিষ্ট কলামের ভেতরে গাড়িটি ঢোকানো
+            const targetCol = world.children[stepIndex + 1]; // +1 কারণ chicken একটি এলিমেন্ট
+            targetCol.appendChild(car);
 
             let topPos = -100;
-            let speed = 9; 
+            let speed = 9 + (multiplier / 100); // যেমন এগোবেন গাড়িও তেমন দ্রুত হবে
 
             let interval = setInterval(() => {
                 if (isGameOver) { clearInterval(interval); return; }
                 topPos += speed;
                 car.style.top = topPos + "px";
 
-                // কলামের মাঝখানে সংঘর্ষ চেক (উচ্চতা অনুযায়ী)
-                if (currentColumn === colIndex && topPos > 110 && topPos < 210) {
+                // সংঘর্ষ চেক
+                if (currentStep === stepIndex && topPos > 110 && topPos < 210) {
                     isGameOver = true;
-                    alert("সংঘর্ষ হয়েছে! মুরগিটি চাপা পড়েছে।");
-                    location.reload(); 
+                    alert("ওহ না! ২০০০০x এর স্বপ্নে বাধা দিল গাড়ি।");
+                    location.reload();
                 }
 
-                if (topPos > 450) {
+                if (topPos > 500) {
                     car.remove();
                     clearInterval(interval);
                 }
@@ -106,40 +101,39 @@
         }
 
         function nextStep() {
-            if (isGameOver) return;
-            currentColumn++;
+            if (isGameOver || multiplier >= maxMultiplier) return;
+
+            currentStep++;
             
-            if (currentColumn >= 5) {
-                alert("রাস্তা পার হওয়া সফল!");
-                cashOut();
-                return;
+            // আনলিমিটেড কলাম তৈরি
+            if (currentStep + 5 >= world.children.length) {
+                createColumn();
             }
 
-            // প্রতিটি কলাম ৬০px, মুরগি ৪৫px, তাই ৭.৫px ফাঁকা রেখে মাঝখানে বসানো
-            let centerX = (currentColumn * 60) + 7.5; 
-            chicken.style.left = centerX + "px";
+            // ক্যামেরা স্ক্রলিং (ডান থেকে বামে)
+            const offset = currentStep * 60;
+            world.style.transform = `translateX(-${offset}px)`;
+            
+            // মুরগির পজিশন আপডেট (ভিজুয়ালি মুরগি এক জায়গায় থাকবে, কলাম সরবে)
+            chicken.style.left = (offset + 7.5) + "px";
 
-            spawnCar(currentColumn);
+            // ওই কলামে গাড়ি নামানো
+            spawnCar(currentStep);
 
-            multiplier += 0.50;
-            document.getElementById("mult").innerText = multiplier.toFixed(2);
+            // মাল্টিপ্লায়ার আপডেট
+            if (multiplier < maxMultiplier) {
+                multiplier += 0.50; 
+                document.getElementById("mult").innerText = multiplier.toFixed(2);
+            }
         }
 
         function cashOut() {
-            if (currentColumn === -1 || isGameOver) return;
-            let win = 10 * multiplier;
+            if (currentStep === -1 || isGameOver) return;
+            let win = bet * multiplier;
             balance += win;
             document.getElementById("balance").innerText = balance.toFixed(2);
-            alert("জিতেছেন: $" + win.toFixed(2));
-            resetRound();
-        }
-
-        function resetRound() {
-            currentColumn = -1;
-            multiplier = 1.0;
-            chicken.style.left = "-60px";
-            document.getElementById("mult").innerText = "1.00";
-            carContainer.innerHTML = "";
+            alert("অভিনন্দন! আপনি জিতেছেন: $" + win.toFixed(2));
+            location.reload();
         }
     </script>
 </body>
