@@ -1,9 +1,10 @@
+        
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chicken Road - Final Pro</title>
+    <title>Chicken Road - Sound Edition</title>
     <style>
         /* ১. গ্লোবাল স্টাইল */
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', sans-serif; }
@@ -41,28 +42,19 @@
         }
         #game-world { position: absolute; display: flex; top: 0; left: 0; height: 100%; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
         
-        /* কলাম (বাকি সব সবুজ হবে) */
-.column { 
-    width: 70px; 
-    height: 100%; 
-    border-right: 1px dashed #27ae60; /* বর্ডারও হালকা সবুজ */
-    position: relative; 
-    flex-shrink: 0; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    
-    /* নতুন: ব্যাকগ্রাউন্ড গাঢ় সবুজ */
-    background-color: #0e2b1a; 
-}
-
-/* প্রথম কলাম (এখন সাদা হবে) */
-.first-col { 
-    background-color: #ffffff; /* সাদা ব্যাকগ্রাউন্ড */
-    border-right: 1px solid #ddd; /* বর্ডারটি হালকা ধূসর করা হলো যাতে সাদার সাথে মানায় */
-}
-
-
+        /* কলাম ডিজাইন (আপনার অনুরোধ অনুযায়ী সবুজ) */
+        .column { 
+            width: 70px; height: 100%; 
+            border-right: 1px dashed #1e5631; 
+            position: relative; flex-shrink: 0; 
+            display: flex; align-items: center; justify-content: center;
+            background-color: #0b3318; /* গাঢ় সবুজ */
+        }
+        .first-col { 
+            background-color: #202020; /* প্রথমটি কালো */
+            border-right: 1px solid #333; 
+        } 
+        
         .manhole { 
             width: 52px; height: 52px; border-radius: 50%; 
             background: radial-gradient(circle, #2a2a2a 30%, #161616 100%); 
@@ -93,12 +85,7 @@
 
         /* গাড়ি */
         .car { position: absolute; width: 50px; height: 85px; top: -120px; z-index: 3; }
-        
-        /* অ্যাম্বিয়েন্ট কার (ব্যাকগ্রাউন্ডে চলবে) */
-        .ambient-car { 
-            position: absolute; width: 50px; height: 85px; top: -120px; z-index: 1; 
-            opacity: 0.5; filter: brightness(0.7); pointer-events: none;
-        }
+        .ambient-car { position: absolute; width: 50px; height: 85px; top: -120px; z-index: 1; opacity: 0.5; filter: brightness(0.7); pointer-events: none; }
 
         /* ব্যারিয়ার */
         .barrier {
@@ -200,6 +187,15 @@
         let isWaiting = false;
         let crashInterval = null;
 
+        // --- সাউন্ড সেটআপ ---
+        const sounds = {
+            click: new Audio('click.mp3'),
+            jump: new Audio('jump.mp3'),
+            safe: new Audio('safe.mp3'),
+            crash: new Audio('crash.mp3'),
+            win: new Audio('win.mp3')
+        };
+
         const world = document.getElementById("game-world");
         const chickenGroup = document.getElementById("chicken-group");
         const badge = document.getElementById("float-badge");
@@ -210,16 +206,12 @@
         const balanceDisplay = document.getElementById("balance");
         const betValDisplay = document.getElementById("bet-val");
 
-        // --- অ্যাম্বিয়েন্ট ট্রাফিক (নতুন অংশ) ---
+        // অ্যাম্বিয়েন্ট ট্রাফিক
         setInterval(() => {
             if (isGameOver) return;
-            
-            // মুরগি যেখানে আছে তার আশেপাশের কলামে র্যান্ডম গাড়ি ফেলা
             let startRange = Math.max(1, currentStep + 2); 
             let endRange = currentStep + 6;
             let randomCol = Math.floor(Math.random() * (endRange - startRange + 1)) + startRange;
-            
-            // মুরগির কলাম বাদ দিয়ে অন্য কলামে
             if (randomCol !== currentStep && randomCol !== currentStep + 1) {
                 spawnAmbientCar(randomCol);
             }
@@ -228,31 +220,23 @@
         function spawnAmbientCar(colIndex) {
             const cols = document.querySelectorAll('.column');
             if (!cols[colIndex]) return;
-
             const car = document.createElement("img");
             const carId = Math.floor(Math.random() * 3) + 1;
             car.src = `car${carId}.png`;
             car.className = "ambient-car";
-            
             cols[colIndex].appendChild(car);
-
             let topPos = -120;
             let speed = 12 + Math.random() * 5; 
-
             let interval = setInterval(() => {
                 topPos += speed;
                 car.style.top = topPos + "px";
-                
-                if (topPos > 600) {
-                    car.remove();
-                    clearInterval(interval);
-                }
+                if (topPos > 600) { car.remove(); clearInterval(interval); }
             }, 20);
         }
-        // --------------------------------------
 
         function setDifficulty(mode) {
             if (isGameActive) return;
+            sounds.click.cloneNode(true).play();
             difficulty = mode;
             document.getElementById('btn-medium').className = mode === 'medium' ? 'diff-btn active' : 'diff-btn';
             document.getElementById('btn-hard').className = mode === 'hard' ? 'diff-btn active' : 'diff-btn';
@@ -291,6 +275,8 @@
 
         function updateBet(action) {
             if (isGameActive) return; 
+            sounds.click.cloneNode(true).play();
+            
             if (action === 'minus') currentBet -= 10;
             else if (action === 'plus') currentBet += 10;
             else if (action === 'min') currentBet = MIN_BET;
@@ -309,7 +295,6 @@
             if (isWaiting) {
                 const activeCols = document.querySelectorAll('.column')[currentStep];
                 if(activeCols) {
-                    // শুধুমাত্র মেইন কার রিমুভ হবে
                     const mainCar = activeCols.querySelector('.car:not(.ambient-car)');
                     if(mainCar) mainCar.remove();
                 }
@@ -319,6 +304,7 @@
 
             if (!isGameActive) {
                 if (balance < currentBet) { alert("পর্যাপ্ত ব্যালেন্স নেই!"); return; }
+                sounds.click.play();
                 balance -= currentBet;
                 balanceDisplay.innerText = balance;
                 isGameActive = true;
@@ -334,6 +320,8 @@
 
         function moveChicken() {
             currentStep++;
+            sounds.jump.play();
+            
             let offset = (currentStep * 70);
             world.style.transform = `translateX(-${offset}px)`;
             chickenGroup.style.left = offset + "px";
@@ -358,12 +346,17 @@
             targetCol.appendChild(car);
 
             if (isSafe) {
-                setTimeout(() => { if (!isGameOver) barrier.style.display = "block"; }, 100);
+                setTimeout(() => { 
+                    if (!isGameOver) {
+                        barrier.style.display = "block"; 
+                        sounds.safe.play();
+                    }
+                }, 100);
             }
 
             let topPos = -120;
             let speed = difficulty === 'hard' ? 18 : 15;
-            let stopPoint = 30; // ব্যারিয়ারের জন্য পারফেক্ট পজিশন
+            let stopPoint = 30; 
 
             let interval = setInterval(() => {
                 if (isGameOver && !isSafe) { }
@@ -397,6 +390,7 @@
         }
 
         function triggerCrash(car) {
+            sounds.crash.play();
             isGameOver = true;
             isGameActive = false;
             badge.style.background = "#e74c3c";
@@ -424,6 +418,7 @@
 
         function cashOut() {
             if (!isGameActive || isGameOver) return;
+            sounds.win.play();
             let win = Math.floor(currentBet * currentMultiplier);
             balance += win;
             balanceDisplay.innerText = balance;
@@ -433,6 +428,7 @@
 
         function resetGame() {
             if(crashInterval) clearInterval(crashInterval);
+            sounds.click.play();
 
             isGameOver = false;
             isGameActive = false;
@@ -457,7 +453,6 @@
             chickenGroup.style.left = "0px"; 
             chickenGroup.style.transform = "translateY(-50%)";
             
-            // সব গাড়ি ক্লিন
             document.querySelectorAll('.car').forEach(c => c.remove());
             document.querySelectorAll('.ambient-car').forEach(c => c.remove());
             
