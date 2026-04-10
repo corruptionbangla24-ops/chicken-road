@@ -1,99 +1,208 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - Pro Edition</title>
+    <title>Chicken Road - Betting Panel</title>
     <style>
-        body { margin: 0; background-color: #1a1a1a; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; }
+        body { margin: 0; background-color: #1a1a1a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; }
         
-        header { width: 100%; max-width: 360px; display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #222; box-sizing: border-box; }
-        .balance-box { background: #333; padding: 5px 12px; border-radius: 15px; color: #ffcc00; font-weight: bold; }
-        .nav-links { display: flex; gap: 12px; font-size: 11px; text-transform: uppercase; }
-        .nav-links span { cursor: pointer; color: #888; border-bottom: 1px solid #555; }
+        /* হেডার */
+        header { width: 100%; max-width: 360px; display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #222; box-sizing: border-box; border-bottom: 1px solid #333; }
+        .brand { font-weight: 900; letter-spacing: 1px; font-size: 16px; color: #fff; }
+        .balance-box { background: #1e3c72; padding: 6px 15px; border-radius: 20px; color: #fff; font-weight: bold; border: 1px solid #4a90e2; box-shadow: 0 0 10px rgba(74, 144, 226, 0.3); }
 
-        #viewport { position: relative; width: 340px; height: 450px; background: #333; border: 3px solid #444; overflow: hidden; margin-top: 10px; border-radius: 10px; }
+        /* গেম এরিয়া */
+        #viewport { position: relative; width: 340px; height: 380px; background: #333; border: 2px solid #444; overflow: hidden; margin-top: 10px; border-radius: 8px; }
         #game-world { position: absolute; display: flex; top: 0; left: 0; height: 100%; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         
         .column { width: 68px; height: 100%; border-right: 1px solid #444; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .first-col { background-color: #2c3e50; } 
-
-        .bubble { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #ffcc00; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #ffcc00; background: rgba(0,0,0,0.4); z-index: 2; }
-
+        .bubble { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #f1c40f; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #f1c40f; background: rgba(0,0,0,0.4); z-index: 2; }
+        
         #chicken { position: absolute; width: 45px; top: 50%; transform: translateY(-50%); left: 10px; z-index: 10; transition: left 0.3s; }
         .car { position: absolute; width: 50px; height: 85px; top: -100px; z-index: 5; }
 
-        #controls { width: 340px; background: #222; padding: 15px; border-radius: 0 0 10px 10px; box-sizing: border-box; }
-        .diff-select { width: 100%; padding: 12px; background: #333; color: white; border: 1px solid #444; border-radius: 5px; margin-bottom: 12px; font-size: 14px; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 16px; font-size: 15px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-go { background: #28a745; color: white; }
-        .btn-cash { background: #f3c11a; color: black; }
-        button:active { transform: scale(0.96); }
+        /* বেটিং কন্ট্রোল প্যানেল (স্ক্রিনশটের মতো) */
+        #controls { width: 340px; background: #222; padding: 15px; border-radius: 0 0 10px 10px; box-sizing: border-box; margin-top: -2px; }
+        
+        /* ইনপুট সেকশন */
+        .bet-control-row { display: flex; align-items: center; justify-content: space-between; background: #111; padding: 5px; border-radius: 8px; border: 1px solid #333; margin-bottom: 10px; }
+        
+        .bet-btn { width: 35px; height: 35px; background: #333; border: none; color: #fff; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .bet-btn:active { background: #555; }
+        
+        .bet-input { width: 70px; background: transparent; border: none; color: white; text-align: center; font-weight: bold; font-size: 16px; }
+        
+        .multiplier-btn { background: #333; border: none; color: #aaa; font-size: 12px; padding: 8px 10px; border-radius: 5px; cursor: pointer; margin-left: 5px; font-weight: bold; }
+        .multiplier-btn:hover { background: #444; color: white; }
+
+        /* ডিফিকাল্টি ড্রপডাউন */
+        .diff-select { width: 100%; padding: 12px; background: #333; color: white; border: 1px solid #444; border-radius: 5px; margin-bottom: 12px; font-size: 14px; appearance: none; text-align: center; }
+
+        /* মেইন বাটন */
+        .action-btn { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+        .btn-play { background: #27ae60; color: white; box-shadow: 0 4px 0 #219150; }
+        .btn-play:active { transform: translateY(4px); box-shadow: none; }
+        
+        .btn-cashout { background: #f39c12; color: black; display: none; box-shadow: 0 4px 0 #d35400; }
+        .game-active .btn-play { display: none; } /* গেম চললে Play বাটন লুকাবে */
+        .game-active .btn-cashout { display: block; } /* গেম চললে Cashout দেখাবে */
+
     </style>
 </head>
 <body>
 
     <header>
-        <div style="font-weight: bold; letter-spacing: 1px; font-size: 13px;">CHICKEN ROAD</div>
+        <div class="brand">CHICKEN ROAD</div>
         <div class="balance-box">$ <span id="balance">1000.00</span></div>
-        <div class="nav-links">
-            <span onclick="alert('History is empty')">History</span>
-            <span id="sound-btn" onclick="toggleSound()">Sound: ON</span>
-        </div>
     </header>
 
     <div id="viewport">
         <div id="game-world">
-            <div class="column first-col">
-                <span style="font-size: 9px; position: absolute; top: 20%; color: #666; font-weight: bold;">SAFE ZONE</span>
-            </div> 
+            <div class="column first-col"></div> 
             <img id="chicken" src="chicken.png">
         </div>
     </div>
 
     <div id="controls">
-        <select class="diff-select" id="difficulty">
-            <option value="medium">MEDIUM MODE</option>
-            <option value="hard">HARD MODE</option>
-        </select>
-        <div class="btn-group">
-            <button class="btn-cash" onclick="cashOut()">Cash Out</button>
-            <button class="btn-go" onclick="nextStep()">GO</button>
+        <!-- বাজি ধরার ক্যালকুলেটর -->
+        <div class="bet-control-row">
+            <button class="bet-btn" onclick="adjustBet(-10)">−</button>
+            <input type="text" id="bet-amount" class="bet-input" value="10.00" readonly>
+            <button class="bet-btn" onclick="adjustBet(10)">+</button>
+            
+            <div style="border-left: 1px solid #333; height: 25px; margin: 0 5px;"></div>
+            
+            <button class="multiplier-btn" onclick="multiplyBet(0.5)">x0.5</button>
+            <button class="multiplier-btn" onclick="multiplyBet(2)">x2.0</button>
         </div>
+
+        <!-- ডিফিকাল্টি -->
+        <select class="diff-select" id="difficulty">
+            <option value="medium">Difficulty: Medium</option>
+            <option value="hard">Difficulty: Hard</option>
+        </select>
+
+        <!-- প্লে / ক্যাশআউট বাটন -->
+        <button id="main-btn" class="action-btn btn-play" onclick="handleGameAction()">PLAY</button>
     </div>
 
     <script>
+        let balance = 1000.00;
+        let currentBet = 10.00;
         let currentStep = 0;
-        let totalBalance = 1000;
         let currentMultiplier = 1.0;
+        let isGameRunning = false;
         let isGameOver = false;
-        let soundOn = true;
 
         const world = document.getElementById("game-world");
         const chicken = document.getElementById("chicken");
+        const btnMain = document.getElementById("main-btn");
+        const controlsDiv = document.getElementById("controls");
+        const betInput = document.getElementById("bet-amount");
+        const balanceDisplay = document.getElementById("balance");
 
+        // কলাম তৈরি
         function generateColumns(count) {
+            world.innerHTML = '<div class="column first-col"></div><img id="chicken" src="chicken.png">';
             for (let i = 1; i <= count; i++) {
                 let col = document.createElement("div");
                 col.className = "column";
-                let val = (1 + (i * 0.13)).toFixed(2); 
+                let val = (1 + (i * 0.15)).toFixed(2); 
                 col.innerHTML = `<div class="bubble">${val}x</div>`;
                 world.appendChild(col);
             }
         }
-        generateColumns(100); 
+        generateColumns(50);
+
+        // বেটিং ক্যালকুলেটর ফাংশন
+        function adjustBet(amount) {
+            if (isGameRunning) return; // গেম চলাকালীন বাজি বদলানো যাবে না
+            currentBet += amount;
+            if (currentBet < 1) currentBet = 1;
+            if (currentBet > balance) currentBet = balance;
+            updateBetDisplay();
+        }
+
+        function multiplyBet(factor) {
+            if (isGameRunning) return;
+            currentBet *= factor;
+            if (currentBet < 1) currentBet = 1;
+            if (currentBet > balance) currentBet = balance;
+            updateBetDisplay();
+        }
+
+        function updateBetDisplay() {
+            betInput.value = currentBet.toFixed(2);
+        }
+
+        // গেম কন্ট্রোল (PLAY / GO / CASHOUT)
+        function handleGameAction() {
+            if (!isGameRunning) {
+                startGame();
+            } else {
+                nextStep();
+            }
+        }
+
+        function startGame() {
+            if (balance < currentBet) {
+                alert("Insufficient Balance!");
+                return;
+            }
+            // বাজি ব্যালেন্স থেকে কাটা
+            balance -= currentBet;
+            balanceDisplay.innerText = balance.toFixed(2);
+            
+            // গেম স্টেট রিসেট
+            isGameRunning = true;
+            isGameOver = false;
+            currentStep = 0;
+            currentMultiplier = 1.0;
+            
+            // UI আপডেট (Play -> GO)
+            btnMain.innerText = "GO";
+            btnMain.style.background = "#28a745"; // সবুজ
+            
+            // ক্যাশ আউট বাটন যোগ করা (নিচে আলাদা বাটন না দিয়ে PLAY বাটন পাল্টে দেওয়া হলো)
+            // তবে আপনার স্ক্রিনশট অনুযায়ী নিচে আলাদা বাটন চাইলে কমেন্ট করবেন
+            
+            // এখানে ক্যাশ আউট করার জন্য আমরা আলাদা বাটন তৈরি করছি
+            let cashBtn = document.getElementById("cash-btn");
+            if(!cashBtn) {
+                cashBtn = document.createElement("button");
+                cashBtn.id = "cash-btn";
+                cashBtn.className = "action-btn btn-cashout";
+                cashBtn.innerText = "CASH OUT";
+                cashBtn.onclick = cashOut;
+                cashBtn.style.marginTop = "10px";
+                document.getElementById("controls").appendChild(cashBtn);
+            }
+            cashBtn.style.display = "block";
+            controlsDiv.classList.add("game-active");
+            
+            // চিকেন পজিশন রিসেট
+            world.style.transform = `translateX(0px)`;
+            chicken.style.left = "10px";
+        }
 
         function nextStep() {
             if (isGameOver) return;
             currentStep++;
             
+            // ক্যামেরা মুভমেন্ট
             let offset = (currentStep * 68);
             world.style.transform = `translateX(-${offset}px)`;
             chicken.style.left = (offset + 10) + "px";
 
             spawnCar(currentStep);
-            currentMultiplier = (1 + (currentStep * 0.13)).toFixed(2);
+            
+            currentMultiplier = (1 + (currentStep * 0.15)).toFixed(2);
+            
+            // ক্যাশআউট বাটনে টাকার অঙ্ক দেখানো
+            let potentialWin = (currentBet * currentMultiplier).toFixed(2);
+            document.getElementById("cash-btn").innerHTML = `CASH OUT <br> <small>$${potentialWin}</small>`;
         }
 
         function spawnCar(step) {
@@ -102,8 +211,8 @@
             car.src = `car${carId}.png`;
             car.className = "car";
             
-            const targetCol = world.children[step + 1]; 
-            targetCol.appendChild(car);
+            const targetCol = world.children[step + 1]; // +1 কারণ প্রথম কলাম ও চিকেন আছে
+            if(targetCol) targetCol.appendChild(car);
 
             let topPos = -100;
             let speed = document.getElementById("difficulty").value === "hard" ? 13 : 9;
@@ -114,9 +223,8 @@
                 car.style.top = topPos + "px";
 
                 if (topPos > 185 && topPos < 255) { 
-                    isGameOver = true;
-                    alert("GAME OVER! Multiplier: " + currentMultiplier + "x");
-                    location.reload();
+                    gameOver();
+                    clearInterval(interval);
                 }
 
                 if (topPos > 460) {
@@ -126,19 +234,36 @@
             }, 30);
         }
 
-        function toggleSound() {
-            soundOn = !soundOn;
-            document.getElementById("sound-btn").innerText = "Sound: " + (soundOn ? "ON" : "OFF");
+        function gameOver() {
+            isGameOver = true;
+            isGameRunning = false;
+            alert("GAME OVER! You lost $" + currentBet.toFixed(2));
+            resetGameUI();
         }
 
         function cashOut() {
-            if (currentStep === 0 || isGameOver) return;
-            let win = 10 * currentMultiplier; 
-            totalBalance += win;
-            document.getElementById("balance").innerText = totalBalance.toFixed(2);
-            alert("CONGRATS! You won: $" + win.toFixed(2));
-            location.reload();
+            if (!isGameRunning || isGameOver) return;
+            
+            let win = currentBet * currentMultiplier;
+            balance += win;
+            balanceDisplay.innerText = balance.toFixed(2);
+            
+            alert("SUCCESS! You won: $" + win.toFixed(2));
+            
+            isGameRunning = false;
+            resetGameUI();
+        }
+
+        function resetGameUI() {
+            btnMain.innerText = "PLAY";
+            btnMain.style.background = "#27ae60"; // ব্যাক টু অরিজিনাল গ্রিন
+            document.getElementById("cash-btn").style.display = "none";
+            controlsDiv.classList.remove("game-active");
+            
+            // চিকেন এবং কলাম রিসেট
+            // generateColumns(50); // নতুন করে কলাম রিলোড (অপশনাল)
         }
     </script>
 </body>
 </html>
+              
