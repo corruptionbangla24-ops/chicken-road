@@ -1,29 +1,50 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chicken Road - Final Pro</title>
+    <title>Chicken Road - Complete</title>
     <style>
-        /* ১. গ্লোবাল স্টাইল */
+        /* ১. গ্লোবাল ও মোবাইল ফিক্স */
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #161616; color: white; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
+
+        body { 
+            background-color: #161616; 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            height: 100vh; 
+            height: 100dvh; /* মোবাইলের নিচের বার সমস্যা সমাধান */
+            overflow: hidden; 
+        }
         
-        /* ২. হেডার */
-        header { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #1b1b1b; border-bottom: 1px solid #333; z-index: 100; }
-        .brand { font-weight: 800; font-size: 16px; color: #fff; letter-spacing: 0.5px; }
+        /* ২. হেডার (মেনু সহ) */
+        header { 
+            width: 100%; max-width: 400px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px 20px; background: #1b1b1b; border-bottom: 1px solid #333; 
+            z-index: 100; flex-shrink: 0;
+        }
+        .brand { font-weight: 800; font-size: 16px; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; }
         .brand span { color: #e74c3c; }
-        .balance-box { background: #252525; padding: 8px 15px; border-radius: 6px; color: #fff; font-weight: bold; font-size: 16px; border: 1px solid #333; min-width: 100px; text-align: center; }
+        
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .balance-box { background: #252525; padding: 6px 12px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 15px; border: 1px solid #333; min-width: 90px; text-align: center; }
+        .menu-icon { font-size: 24px; color: #aaa; cursor: pointer; }
 
         /* ৩. গেম ভিউপোর্ট */
-        #viewport { position: relative; width: 350px; flex-grow: 1; background: #181818; overflow: hidden; border-left: 2px solid #222; border-right: 2px solid #222; }
+        #viewport { 
+            position: relative; width: 100%; max-width: 400px; 
+            flex-grow: 1; background: #181818; overflow: hidden; 
+            border-left: 1px solid #222; border-right: 1px solid #222; 
+        }
         #game-world { position: absolute; display: flex; top: 0; left: 0; height: 100%; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
         
         /* কলাম */
         .column { width: 70px; height: 100%; border-right: 1px dashed #333; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .first-col { background-color: #202020; border-right: 1px solid #333; } 
         
-        /* ম্যানহোল (স্ক্রিনশটের মতো) */
         .manhole { 
             width: 52px; height: 52px; border-radius: 50%; 
             background: radial-gradient(circle, #2a2a2a 30%, #161616 100%); 
@@ -33,7 +54,7 @@
             box-shadow: inset 0 0 8px #000; 
         }
 
-        /* মুরগি ও আইটেম */
+        /* ৪. মুরগি ও গেম এলিমেন্টস */
         #chicken-group { 
             position: absolute; width: 70px; top: 50%; left: 0; 
             transform: translateY(-50%); z-index: 10; 
@@ -48,7 +69,6 @@
             font-size: 10px; font-weight: bold; text-align: center; min-width: 40px; 
             margin-top: 6px; position: relative; z-index: 20; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-
         @keyframes idle { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) translateY(-2px); } }
 
         .car { position: absolute; width: 50px; height: 85px; top: -120px; z-index: 3; }
@@ -60,32 +80,37 @@
             display: none;
         }
 
-        /* ৪. কন্ট্রোল প্যানেল (স্ক্রিনশট স্টাইল) */
-        #controls { width: 360px; background: #1b1b1b; padding: 15px; box-sizing: border-box; border-top: 1px solid #333; z-index: 100; }
-        
-        /* ইনপুট গ্রুপ */
+        /* ৫. কন্ট্রোল প্যানেল (সব ফিচার সহ) */
+        #controls { 
+            width: 100%; max-width: 400px; background: #1b1b1b; 
+            padding: 15px 15px 35px 15px; /* নিচে বেশি জায়গা */
+            box-sizing: border-box; border-top: 1px solid #333; 
+            z-index: 100; flex-shrink: 0; 
+        }
+
+        /* ডিফিকাল্টি বাটন (মিসিং ছিল) */
+        .diff-row { display: flex; background: #111; border-radius: 6px; padding: 4px; margin-bottom: 12px; border: 1px solid #333; }
+        .diff-btn { flex: 1; padding: 8px; border: none; background: transparent; color: #666; font-weight: bold; font-size: 12px; cursor: pointer; border-radius: 4px; text-transform: uppercase; transition: 0.2s; }
+        .diff-btn.active { background: #2a2a2a; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+        /* ইনপুট */
         .input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .ctrl-btn { width: 50px; height: 50px; background: #252525; border: none; border-radius: 6px; color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .ctrl-btn:active { background: #333; transform: scale(0.95); }
-
         .bet-display { flex-grow: 1; background: #161616; border: 1px solid #333; height: 50px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 22px; letter-spacing: 1px; }
 
-        /* শর্টকাট বাটন */
+        /* শর্টকাট */
         .shortcuts { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .short-btn { background: #252525; border: 1px solid #333; color: #888; padding: 12px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .short-btn:active { background: #333; color: #fff; }
+        .short-btn { background: #252525; border: 1px solid #333; color: #888; padding: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .short-btn:active { background: #333; color: white; }
 
-        /* মেইন বাটন */
+        /* অ্যাকশন বাটন */
         .actions { display: grid; grid-template-columns: 1fr 1.2fr; gap: 15px; height: 60px; }
-        
         .btn-cashout { background: #f1c40f; border: none; border-radius: 6px; color: #111; font-weight: 900; font-size: 18px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.1s; }
         .btn-cashout:active { transform: scale(0.98); opacity: 0.9; }
-        .btn-cashout span { font-size: 13px; font-weight: bold; margin-top: 2px; }
-        
+        .btn-cashout span { font-size: 12px; font-weight: bold; margin-top: 2px; }
         .btn-go { background: #2ecc71; border: none; border-radius: 6px; color: white; font-weight: 900; font-size: 24px; cursor: pointer; transition: 0.1s; }
         .btn-go:active { transform: scale(0.98); opacity: 0.9; }
-        
-        /* ডিসেবল স্টাইল */
         .btn-disabled { opacity: 0.4; pointer-events: none; background: #333 !important; color: #777 !important; }
     </style>
 </head>
@@ -93,7 +118,10 @@
 
     <header>
         <div class="brand">CHICKEN <span>ROAD</span></div>
-        <div class="balance-box">৳ <span id="balance">1000</span></div>
+        <div class="header-right">
+            <div class="balance-box">৳ <span id="balance">1000</span></div>
+            <div class="menu-icon">☰</div>
+        </div>
     </header>
 
     <div id="viewport">
@@ -108,14 +136,18 @@
     </div>
 
     <div id="controls">
-        <!-- ইনপুট -->
+        <!-- ডিফিকাল্টি (এখন যুক্ত হয়েছে) -->
+        <div class="diff-row">
+            <button class="diff-btn active" id="btn-medium" onclick="setDifficulty('medium')">Medium</button>
+            <button class="diff-btn" id="btn-hard" onclick="setDifficulty('hard')">Hard</button>
+        </div>
+
         <div class="input-group">
             <button class="ctrl-btn" onclick="updateBet('minus')">−</button>
             <div class="bet-display">৳ <span id="bet-val">10</span></div>
             <button class="ctrl-btn" onclick="updateBet('plus')">+</button>
         </div>
         
-        <!-- শর্টকাট -->
         <div class="shortcuts">
             <button class="short-btn" onclick="updateBet('min')">MIN</button>
             <button class="short-btn" onclick="updateBet('half')">1/2</button>
@@ -123,7 +155,6 @@
             <button class="short-btn" onclick="updateBet('max')">MAX</button>
         </div>
 
-        <!-- অ্যাকশন বাটন -->
         <div class="actions">
             <button id="btn-cashout" class="btn-cashout btn-disabled" onclick="cashOut()">
                 CASH OUT <br><span id="cash-val">৳ 0</span>
@@ -133,7 +164,6 @@
     </div>
 
     <script>
-        // --- গেম কনফিগারেশন ---
         let balance = 1000;
         let currentBet = 10;
         const MIN_BET = 1;
@@ -141,12 +171,12 @@
         
         let currentStep = 0;
         let currentMultiplier = 1.00;
+        let difficulty = 'medium'; // ডিফল্ট
         let isGameActive = false;
         let isGameOver = false;
         let isWaiting = false;
         let crashInterval = null;
 
-        // এলিমেন্টস সিলেকশন
         const world = document.getElementById("game-world");
         const chickenGroup = document.getElementById("chicken-group");
         const badge = document.getElementById("float-badge");
@@ -157,27 +187,37 @@
         const balanceDisplay = document.getElementById("balance");
         const betValDisplay = document.getElementById("bet-val");
 
-        // ১. বোর্ড ইনিশিয়ালাইজেশন
+        // ১. ডিফিকাল্টি সেটআপ
+        function setDifficulty(mode) {
+            if (isGameActive) return;
+            difficulty = mode;
+            
+            document.getElementById('btn-medium').className = mode === 'medium' ? 'diff-btn active' : 'diff-btn';
+            document.getElementById('btn-hard').className = mode === 'hard' ? 'diff-btn active' : 'diff-btn';
+            
+            initWorld(); // রেট আপডেট করার জন্য বোর্ড রিফ্রেশ
+        }
+
+        // ২. বোর্ড তৈরি
         function initWorld() {
             const existingCols = document.querySelectorAll('.column');
             existingCols.forEach(col => col.remove());
 
-            // প্রথম কলাম (Start Zone)
             let firstCol = document.createElement("div");
             firstCol.className = "column first-col";
             world.insertBefore(firstCol, chickenGroup);
 
-            // ১০০টি কলাম (Multiplier Zone)
+            // ডিফিকাল্টি অনুযায়ী রেট (Medium: 0.12, Hard: 0.18)
+            let rate = difficulty === 'hard' ? 0.18 : 0.12;
+
             for (let i = 1; i <= 100; i++) {
                 let col = document.createElement("div");
                 col.className = "column";
-                // মাল্টিপ্লায়ার (স্ক্রিনশটের সাথে মিলিয়ে)
-                let val = (1 + (i * 0.12)).toFixed(2); 
+                let val = (1 + (i * rate)).toFixed(2); 
                 col.innerHTML = `<div class="manhole">${val}x</div>`;
                 world.appendChild(col);
             }
             
-            // পজিশন রিসেট
             world.style.transform = `translateX(0px)`;
             chickenGroup.style.left = "0px";
             chickenGroup.style.top = "50%"; 
@@ -190,10 +230,8 @@
         
         initWorld();
 
-        // ২. বেটিং ফাংশন (Active Check সহ)
         function updateBet(action) {
-            if (isGameActive) return; // গেম চললে বাজি বদলানো যাবে না
-
+            if (isGameActive) return; 
             if (action === 'minus') currentBet -= 10;
             else if (action === 'plus') currentBet += 10;
             else if (action === 'min') currentBet = MIN_BET;
@@ -201,22 +239,14 @@
             else if (action === 'double') currentBet *= 2;
             else if (action === 'max') currentBet = MAX_BET;
 
-            // লিমিট চেক
             if (currentBet < MIN_BET) currentBet = MIN_BET;
             if (currentBet > MAX_BET) currentBet = MAX_BET;
-            
             betValDisplay.innerText = currentBet;
         }
 
-        // ৩. মেইন গেম কন্ট্রোল
         function handleGo() {
-            // গেম ওভার হলে রিসেট বাটন হিসেবে কাজ করবে
-            if (isGameOver) { 
-                resetGame(); 
-                return; 
-            }
+            if (isGameOver) { resetGame(); return; }
             
-            // আগের রাউন্ড ক্লিয়ার করা
             if (isWaiting) {
                 const oldCars = document.querySelectorAll('.car');
                 oldCars.forEach(c => c.remove());
@@ -224,17 +254,15 @@
                 isWaiting = false;
             }
 
-            // নতুন গেম শুরু
             if (!isGameActive) {
                 if (balance < currentBet) { alert("পর্যাপ্ত ব্যালেন্স নেই!"); return; }
                 balance -= currentBet;
                 balanceDisplay.innerText = balance;
                 isGameActive = true;
                 
-                // বাটন আপডেট
                 btnCash.classList.remove("btn-disabled");
                 btnCash.disabled = false;
-                btnGo.disabled = true; // মুভ করার সময় GO বন্ধ
+                btnGo.disabled = true; 
                 btnGo.classList.add("btn-disabled");
             }
             
@@ -243,18 +271,15 @@
 
         function moveChicken() {
             currentStep++;
-            
-            // ক্যামেরা সরানো
             let offset = (currentStep * 70);
             world.style.transform = `translateX(-${offset}px)`;
-            
-            // মুরগিকে ক্যামেরার সাথে রাখা (গুরুত্বপূর্ণ ফিক্স)
             chickenGroup.style.left = offset + "px";
 
-            // ৯০% সেফ থাকার লজিক
-            let isSafe = Math.random() > 0.1; 
+            // ডিফিকাল্টি লজিক
+            // Medium = 10% Crash, Hard = 25% Crash
+            let crashChance = difficulty === 'hard' ? 0.25 : 0.10;
+            let isSafe = Math.random() > crashChance; 
             
-            // একটু দেরিতে গাড়ি নামবে
             setTimeout(() => {
                 spawnCar(currentStep, isSafe);
             }, 300);
@@ -263,7 +288,6 @@
         function spawnCar(step, isSafe) {
             const cols = document.querySelectorAll('.column');
             const targetCol = cols[step]; 
-
             if (!targetCol) return;
 
             const car = document.createElement("img");
@@ -272,25 +296,21 @@
             car.className = "car";
             targetCol.appendChild(car);
 
-            // সেফ হলে ব্যারিয়ার রেডি করা
             if (isSafe) {
                 setTimeout(() => { if (!isGameOver) barrier.style.display = "block"; }, 100);
             }
 
             let topPos = -120;
-            let speed = 15;
+            let speed = difficulty === 'hard' ? 18 : 15;
             let stopPoint = 85; 
 
             let interval = setInterval(() => {
-                if (isGameOver && !isSafe) { /* ক্র্যাশ হলে লুপ চলবে */ }
+                if (isGameOver && !isSafe) { }
                 else if (isGameOver) { clearInterval(interval); return; }
 
-                // সেফ: গাড়ি থামবে
                 if (isSafe && topPos >= stopPoint) {
                     clearInterval(interval);
                     isWaiting = true;
-                    
-                    // বাটন আবার একটিভ হবে
                     btnGo.disabled = false; 
                     btnGo.classList.remove("btn-disabled");
                     updateWin();
@@ -300,7 +320,6 @@
                 topPos += speed;
                 car.style.top = topPos + "px";
 
-                // ক্র্যাশ: নির্দিষ্ট পয়েন্টে আসলে
                 if (!isSafe && topPos > 150) { 
                     triggerCrash(car);
                     clearInterval(interval);
@@ -309,7 +328,8 @@
         }
 
         function updateWin() {
-            currentMultiplier = (1 + (currentStep * 0.12)).toFixed(2);
+            let rate = difficulty === 'hard' ? 0.18 : 0.12;
+            currentMultiplier = (1 + (currentStep * rate)).toFixed(2);
             badge.innerText = currentMultiplier + "x";
             let winAmount = Math.floor(currentBet * currentMultiplier);
             cashVal.innerText = "৳ " + winAmount;
@@ -322,7 +342,6 @@
             badge.style.background = "#e74c3c";
             badge.innerText = "CRASH";
             
-            // বাটন স্টেট চেঞ্জ
             btnGo.innerText = "TRY AGAIN";
             btnGo.style.background = "#e74c3c";
             btnGo.disabled = false;
@@ -332,7 +351,6 @@
             btnCash.disabled = true;
             barrier.style.display = "none"; 
 
-            // পতনের এনিমেশন
             let crashFall = 0;
             if(crashInterval) clearInterval(crashInterval);
 
@@ -340,7 +358,6 @@
                 crashFall += 12;
                 car.style.top = (150 + crashFall) + "px";
                 chickenGroup.style.top = (50 + (crashFall/3.5)) + "%"; 
-                
                 if (crashFall > 600) clearInterval(crashInterval);
             }, 20);
         }
@@ -350,23 +367,19 @@
             let win = Math.floor(currentBet * currentMultiplier);
             balance += win;
             balanceDisplay.innerText = balance;
-            
             isGameActive = false;
             resetGame();
         }
 
         function resetGame() {
-            // ১. ক্র্যাশ থামানো
             if(crashInterval) clearInterval(crashInterval);
 
-            // ২. ভেরিয়েবল রিসেট
             isGameOver = false;
             isGameActive = false;
             isWaiting = false;
             currentStep = 0;
             currentMultiplier = 1.00;
             
-            // ৩. বাটন রিসেট
             btnGo.innerText = "GO";
             btnGo.style.background = "#2ecc71";
             btnGo.disabled = false;
@@ -379,7 +392,6 @@
             badge.innerText = "1.00x";
             badge.style.background = "#27ae60";
 
-            // ৪. মুরগি রিসেট (সবচেয়ে গুরুত্বপূর্ণ)
             chickenGroup.style.transition = 'none';
             chickenGroup.style.top = "50%";
             chickenGroup.style.left = "0px"; 
@@ -396,7 +408,6 @@
     </script>
 </body>
 </html>
-
-                                
-            
+         
+                
             
