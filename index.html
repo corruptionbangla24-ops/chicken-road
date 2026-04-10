@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - Pro Visuals</title>
+    <title>Chicken Road - Realistic Crash</title>
     <style>
         body { margin: 0; background-color: #1e1e1e; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
         
@@ -17,11 +17,10 @@
         #viewport { position: relative; width: 360px; flex-grow: 1; background: #333; overflow: hidden; border-left: 2px solid #444; border-right: 2px solid #444; }
         #game-world { position: absolute; display: flex; top: 0; left: 0; height: 100%; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
         
-        /* কলাম স্টাইল (স্ক্রিনশটের মতো ডটেড লাইন) */
+        /* কলাম */
         .column { width: 70px; height: 100%; border-right: 2px dashed #555; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .first-col { background-color: #2c3e50; border-right: 2px solid #444; } 
         
-        /* ম্যানহোল / সার্কেল */
         .manhole { width: 55px; height: 55px; border-radius: 50%; background: radial-gradient(circle, #3e3e3e 30%, #222 100%); border: 3px solid #444; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #888; z-index: 1; box-shadow: inset 0 0 8px #000; }
 
         /* মুরগি গ্রুপ */
@@ -35,20 +34,12 @@
             transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
         }
         
-        /* মুরগির নিচে ছায়া */
         #chicken-shadow {
-            position: absolute;
-            width: 40px; height: 10px;
-            background: rgba(0,0,0,0.6);
-            border-radius: 50%;
-            bottom: -5px; left: 10px;
-            filter: blur(2px);
-            z-index: -1;
+            position: absolute; width: 40px; height: 10px; background: rgba(0,0,0,0.6); border-radius: 50%; bottom: -5px; left: 10px; filter: blur(2px); z-index: -1;
         }
         
         #chicken-img { width: 100%; animation: idle 2s infinite ease-in-out; position: relative; z-index: 2; }
         
-        /* মাল্টিপ্লায়ার ব্যাজ (সবুজ হলে সেফ) */
         #float-badge {
             background: #34495e; color: white; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; text-align: center; width: 45px; margin: -8px auto 0 auto; position: relative; border: 1px solid #555; box-shadow: 0 3px 6px rgba(0,0,0,0.5); z-index: 5; transition: background 0.3s;
         }
@@ -61,27 +52,16 @@
         /* গাড়ি */
         .car { position: absolute; width: 55px; height: 90px; top: -120px; z-index: 5; left: 7.5px; }
 
-        /* ৩ডি ব্যারিয়ার ডিজাইন (পা সহ) */
+        /* ব্যারিয়ার (সার্কেলের উপরে) */
         .barrier {
             position: absolute;
-            width: 70px; 
-            height: 18px;
-            background: repeating-linear-gradient(
-                -45deg,
-                #f1c40f,
-                #f1c40f 10px,
-                #111 10px,
-                #111 20px
-            );
-            border: 2px solid #fff;
-            border-radius: 4px;
-            top: -45px; /* সার্কেলের উপরে */
-            left: -5px;
-            z-index: 20;
+            width: 70px; height: 18px;
+            background: repeating-linear-gradient(-45deg, #f1c40f, #f1c40f 10px, #111 10px, #111 20px);
+            border: 2px solid #fff; border-radius: 4px;
+            top: -45px; left: -5px; z-index: 20;
             box-shadow: 0 4px 10px rgba(0,0,0,0.7);
             display: none;
         }
-        /* ব্যারিয়ারের স্ট্যান্ড/পা */
         .barrier::before, .barrier::after {
             content: ''; position: absolute; top: 16px; width: 6px; height: 12px; background: #95a5a6; border: 1px solid #555; border-radius: 0 0 3px 3px;
         }
@@ -110,14 +90,9 @@
     <div id="viewport">
         <div id="game-world">
             <div id="chicken-group">
-                <!-- ব্যারিয়ার (উপরে) -->
                 <div id="barrier" class="barrier"></div>
-                
-                <!-- মুরগি এবং ছায়া -->
                 <img id="chicken-img" src="chicken.png">
                 <div id="chicken-shadow"></div>
-                
-                <!-- ব্যাজ (নিচে) -->
                 <div id="float-badge">1.00x</div>
             </div>
         </div>
@@ -146,6 +121,7 @@
         let isGameActive = false;
         let isGameOver = false;
         let isWaiting = false;
+        let isCrashing = false; // নতুন ফ্ল্যাগ: ক্র্যাশ হচ্ছে কিনা
 
         const world = document.getElementById("game-world");
         const chickenGroup = document.getElementById("chicken-group");
@@ -173,7 +149,9 @@
             }
             
             world.style.transform = `translateX(0px)`;
+            // রিসেট পজিশন
             chickenGroup.style.left = "5px";
+            chickenGroup.style.transform = "translateY(-50%)"; // স্বাভাবিক অবস্থান
             badge.innerText = "1.00x";
             badge.style.background = "#34495e";
             barrier.style.display = "none";
@@ -191,13 +169,11 @@
         }
 
         function handleGo() {
-            if (isGameOver) { resetGame(); return; }
-
+            if (isGameOver && !isCrashing) { resetGame(); return; }
             if (isWaiting) {
                 removePreviousCar();
                 isWaiting = false;
             }
-
             if (!isGameActive) {
                 if (balance < currentBet) { alert("Low Balance!"); return; }
                 balance -= currentBet;
@@ -218,14 +194,13 @@
             world.style.transform = `translateX(-${offset}px)`;
             chickenGroup.style.left = (offset + 5) + "px";
 
-            // ৮০% সেফ থাকার লজিক
             let isSafe = Math.random() > 0.2; 
             spawnCar(currentStep, isSafe);
 
             if (isSafe) {
                 currentMultiplier = (1 + (currentStep * 0.12)).toFixed(2);
                 badge.innerText = currentMultiplier + "x";
-                badge.style.background = "#27ae60"; // সেফ হলে সবুজ ব্যাজ
+                badge.style.background = "#2ecc71"; 
                 let winAmount = (currentBet * currentMultiplier).toFixed(2);
                 cashVal.innerText = "$ " + winAmount;
             }
@@ -248,11 +223,14 @@
 
             let topPos = -120;
             let speed = 15;
-            let stopPoint = 80; // ব্যারিয়ারের ঠিক উপরে থামবে
+            let stopPoint = 80;
+            let crashDistance = 0; // নিচে পড়ার হিসাব
 
             let interval = setInterval(() => {
-                if (isGameOver) { clearInterval(interval); return; }
+                // ক্র্যাশ শেষ হলে থামবে
+                if (isGameOver && !isCrashing) { clearInterval(interval); return; }
                 
+                // যদি সেফ হয় এবং ব্যারিয়ারে থামে
                 if (isSafe && topPos >= stopPoint) {
                     clearInterval(interval);
                     isWaiting = true;
@@ -262,15 +240,35 @@
                 topPos += speed;
                 car.style.top = topPos + "px";
 
-                // ক্র্যাশ পজিশন
-                if (!isSafe && topPos > 180) { 
-                    gameOver();
-                    clearInterval(interval);
+                // ক্র্যাশ শুরু (সংঘর্ষের মুহূর্ত)
+                if (!isSafe && !isCrashing && topPos > 180) { 
+                    isCrashing = true;
+                    isGameOver = true;
+                    isGameActive = false;
+                    
+                    // UI আপডেট
+                    badge.style.background = "#e74c3c";
+                    badge.innerText = "CRASH";
+                    btnGo.innerText = "WAIT...";
+                    btnGo.style.background = "#555";
+                    btnCash.disabled = true;
+                    btnCash.style.opacity = "0.5";
+                }
+
+                // ক্র্যাশ এনিমেশন (একসাথে নিচে পড়া)
+                if (isCrashing) {
+                    crashDistance += speed;
+                    // মুরগিকে নিচে নামানো (ট্রান্সফর্ম আপডেট করে)
+                    chickenGroup.style.transform = `translateY(calc(-50% + ${crashDistance}px))`;
                 }
                 
+                // স্ক্রিনের একদম বাইরে চলে গেলে গেম ওভার এলার্ট
                 if (topPos > 500) {
                     car.remove();
                     clearInterval(interval);
+                    if (isCrashing) {
+                        triggerGameOverAlert();
+                    }
                 }
             }, 20);
             
@@ -283,17 +281,11 @@
             barrier.style.display = "none";
         }
 
-        function gameOver() {
-            isGameOver = true;
-            isGameActive = false;
-            isWaiting = false;
-            badge.style.background = "#e74c3c";
+        function triggerGameOverAlert() {
+            isCrashing = false;
             btnGo.innerText = "RETRY";
             btnGo.style.background = "#e74c3c";
-            btnCash.disabled = true;
-            btnCash.style.opacity = "0.5";
-            barrier.style.display = "none";
-            alert("CRASH! Car hit the chicken.");
+            alert("CRASH! You lost $" + currentBet);
         }
 
         function cashOut() {
@@ -310,17 +302,20 @@
             isGameOver = false;
             isGameActive = false;
             isWaiting = false;
+            isCrashing = false;
             currentStep = 0;
             currentMultiplier = 1.00;
+            
             btnGo.innerText = "GO";
             btnGo.style.background = "#2ecc71";
             btnCash.disabled = true;
             btnCash.style.opacity = "0.5";
             cashVal.innerText = "$ 0.00";
-            badge.style.background = "#34495e";
+            
             removePreviousCar();
             initWorld();
         }
     </script>
 </body>
 </html>
+                
