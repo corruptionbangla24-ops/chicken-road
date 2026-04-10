@@ -3,103 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Road - Fixed Alignment</title>
+    <title>Chicken Road - Crash Fixed</title>
     <style>
-        /* গ্লোবাল ফিক্স: বক্স সাইজিং ঠিক করা যাতে পিক্সেল নড়চড় না হয় */
-        * { box-sizing: border-box; }
-
         body { margin: 0; background-color: #1a1a1a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; }
         
         /* হেডার */
         header { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #1f1f1f; border-bottom: 1px solid #333; z-index: 100; }
         .brand { font-weight: 800; font-size: 16px; color: #fff; letter-spacing: 0.5px; }
         .brand span { color: #e74c3c; }
-        
         .balance-box { background: #2b2b2b; padding: 6px 15px; border-radius: 4px; color: #fff; font-weight: bold; font-size: 15px; border: 1px solid #444; min-width: 100px; text-align: center; }
         .menu-icon { font-size: 22px; color: #aaa; cursor: pointer; }
 
         /* গেম ভিউপোর্ট */
-        #viewport { position: relative; width: 350px; /* কলামের গুণিতক (70x5) */ flex-grow: 1; background: #222; overflow: hidden; border-left: 2px solid #333; border-right: 2px solid #333; }
+        #viewport { position: relative; width: 360px; flex-grow: 1; background: #222; overflow: hidden; border-left: 2px solid #333; border-right: 2px solid #333; }
         #game-world { position: absolute; display: flex; top: 0; left: 0; height: 100%; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
         
-        /* কলাম ফিক্স: ঠিক ৭০ পিক্সেল */
+        /* কলাম */
         .column { width: 70px; height: 100%; border-right: 1px dashed #444; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .first-col { background-color: #2c3e50; border-right: 1px solid #444; } 
         
-        /* ম্যানহোল (ভিতরে মাল্টিপ্লায়ার) */
-        .manhole { 
-            width: 50px; height: 50px; border-radius: 50%; 
-            background: radial-gradient(circle, #333 30%, #1a1a1a 100%); 
-            border: 2px solid #444; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 10px; font-weight: bold; color: #666; 
-            z-index: 1; 
-            box-shadow: inset 0 0 5px #000; 
-        }
+        /* ম্যানহোল */
+        .manhole { width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle, #333 30%, #1a1a1a 100%); border: 2px solid #444; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #666; z-index: 1; box-shadow: inset 0 0 5px #000; }
 
-        /* মুরগি গ্রুপ - একদম মাঝখানে সেন্টার করা */
+        /* মুরগি গ্রুপ */
         #chicken-group { 
-            position: absolute; width: 70px; /* কলামের সমান */ top: 50%; transform: translateY(-50%); left: 0; 
+            position: absolute; width: 70px; top: 50%; transform: translateY(-50%); left: 0; 
             z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: left 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
         }
-        
         #chicken-img { width: 50px; animation: idle 2s infinite ease-in-out; position: relative; z-index: 5; }
         #chicken-shadow { width: 40px; height: 10px; background: rgba(0,0,0,0.5); border-radius: 50%; margin-top: -5px; filter: blur(3px); z-index: -1; }
         
-        /* সবুজ ব্যাজ */
-        #float-badge { 
-            background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; 
-            font-size: 10px; font-weight: bold; text-align: center; min-width: 35px; 
-            margin-top: 5px; position: relative; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 20; 
-        }
+        #float-badge { background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; text-align: center; min-width: 35px; margin-top: 5px; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 20; }
 
-        @keyframes idle {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05) translateY(-2px); }
-        }
+        @keyframes idle { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05) translateY(-2px); } }
 
-        /* গাড়ি */
+        /* গাড়ি ও ব্যারিয়ার */
         .car { position: absolute; width: 50px; height: 85px; top: -120px; z-index: 3; }
-        
-        /* ব্যারিয়ার */
-        .barrier {
-            position: absolute;
-            width: 60px; height: 15px;
-            background: repeating-linear-gradient(-45deg, #f1c40f, #f1c40f 10px, #111 10px, #111 20px);
-            border: 2px solid #fff; border-radius: 3px;
-            top: -45px; left: 5px; z-index: 20;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-            display: none;
-        }
+        .barrier { position: absolute; width: 60px; height: 15px; background: repeating-linear-gradient(-45deg, #f1c40f, #f1c40f 10px, #111 10px, #111 20px); border: 2px solid #fff; border-radius: 3px; top: -45px; left: 5px; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.6); display: none; }
         .barrier::before, .barrier::after { content: ''; position: absolute; top: 13px; width: 4px; height: 20px; background: #777; border-radius: 2px; border: 1px solid #555; }
         .barrier::before { left: 5px; } .barrier::after { right: 5px; }
 
-        /* কন্ট্রোল প্যানেল (ক্যালকুলেটর) */
+        /* কন্ট্রোলস */
         #controls { width: 360px; background: #252525; padding: 15px; box-sizing: border-box; border-top: 1px solid #333; z-index: 100; }
-        
         .bet-container { background: #1f1f1f; padding: 10px; border-radius: 8px; border: 1px solid #333; margin-bottom: 15px; }
         .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        
         .calc-btn { width: 45px; height: 45px; background: #333; border: 1px solid #444; color: #fff; font-size: 22px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .calc-btn:active { background: #444; }
-        
         .bet-display { flex-grow: 1; margin: 0 10px; background: #151515; border: 1px solid #444; height: 45px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
-        
         .shortcut-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
         .short-btn { background: #2b2b2b; border: 1px solid #444; color: #888; padding: 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .short-btn:hover { background: #333; color: white; }
-
+        
         .main-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; height: 60px; }
-        
-        .btn-cashout { background: #f1c40f; border: none; border-radius: 6px; color: #000; font-weight: 900; font-size: 18px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 0 #d35400; transition: transform 0.1s; }
-        .btn-cashout:active { transform: translateY(4px); box-shadow: none; }
+        .btn-cashout { background: #f1c40f; border: none; border-radius: 6px; color: #000; font-weight: 900; font-size: 18px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .btn-cashout span { font-size: 12px; font-weight: bold; margin-top: 2px; color: #333; }
-        
-        .btn-go { background: #2ecc71; border: none; border-radius: 6px; color: white; font-weight: 900; font-size: 22px; cursor: pointer; box-shadow: 0 4px 0 #27ae60; transition: transform 0.1s; }
-        .btn-go:active { transform: translateY(4px); box-shadow: none; }
-        .btn-go:disabled { background: #333; color: #555; box-shadow: none; cursor: not-allowed; }
+        .btn-go { background: #2ecc71; border: none; border-radius: 6px; color: white; font-weight: 900; font-size: 22px; cursor: pointer; }
+        .btn-go:disabled { background: #333; color: #555; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -155,6 +113,7 @@
         let isGameActive = false;
         let isGameOver = false;
         let isWaiting = false;
+        let crashInterval = null; // ক্র্যাশ এনিমেশন বন্ধ করার জন্য ভেরিয়েবল
 
         const world = document.getElementById("game-world");
         const chickenGroup = document.getElementById("chicken-group");
@@ -179,15 +138,19 @@
             for (let i = 1; i <= 100; i++) {
                 let col = document.createElement("div");
                 col.className = "column";
-                // মাল্টিপ্লায়ার ক্যালকুলেশন
                 let val = (1 + (i * 0.12)).toFixed(2); 
                 col.innerHTML = `<div class="manhole">${val}x</div>`;
                 world.appendChild(col);
             }
             
-            // রিসেট পজিশন
+            // রিসেট পজিশন (গেম রিসেট হলে এটি কল হয়)
             world.style.transform = `translateX(0px)`;
-            chickenGroup.style.left = "0px"; 
+            
+            // মুরগি রিসেট (ফিক্স)
+            chickenGroup.style.left = "0px";
+            chickenGroup.style.top = "50%"; // নিশ্চিত করা এটি মাঝখানে আছে
+            chickenGroup.style.transform = "translateY(-50%)";
+            
             badge.innerText = "1.00x";
             badge.style.background = "#34495e";
             barrier.style.display = "none";
@@ -195,10 +158,8 @@
         
         initWorld();
 
-        // --- বেটিং লজিক ---
         function updateBet(action) {
             if (isGameActive) return; 
-
             if (action === 'minus') currentBet -= 10;
             else if (action === 'plus') currentBet += 10;
             else if (action === 'min') currentBet = MIN_BET;
@@ -208,15 +169,17 @@
 
             if (currentBet < MIN_BET) currentBet = MIN_BET;
             if (currentBet > MAX_BET) currentBet = MAX_BET;
-            
             betValDisplay.innerText = currentBet;
         }
 
-        // --- গেম অ্যাকশন ---
         function handleGo() {
-            if (isGameOver) { resetGame(); return; }
+            // যদি গেম ওভার হয়ে থাকে এবং ইউজার বাটনে ক্লিক করে
+            if (isGameOver) { 
+                resetGame(); 
+                return; 
+            }
             
-            // যদি ব্যারিয়ারে আটকে থাকে, ক্লিয়ার করুন
+            // যদি ব্যারিয়ারে আটকে থাকে
             if (isWaiting) {
                 const oldCars = document.querySelectorAll('.car');
                 oldCars.forEach(c => c.remove());
@@ -231,7 +194,7 @@
                 isGameActive = true;
                 btnCash.disabled = false;
                 btnCash.style.opacity = "1";
-                btnGo.disabled = true; // গাড়ি চলাকালীন বাটন বন্ধ
+                btnGo.disabled = true; 
             }
             
             moveChicken();
@@ -239,29 +202,24 @@
 
         function moveChicken() {
             currentStep++;
-            
-            // ১. বিশ্ব সরানো (৭০ পিক্সেল)
             let offset = (currentStep * 70);
             world.style.transform = `translateX(-${offset}px)`;
             
-            // ২. মুরগি ফিক্সড পজিশনে রাখা (কলামের সাথে মুভ করবে)
-            // মুরগি আসলে মুভ করবে না, শুধু ক্যামেরা সরবে।
-            // chickenGroup.style.left = (offset) + "px"; -> এটি দরকার নেই কারণ মুরগি গ্রূপ রিলেটিভ
+            // মুরগি গ্রুপ রিলেটিভলি মুভ করবে না, ক্যামেরা সরবে।
+            // তবে ভিজুয়াল গ্লিচ এড়াতে পজিশন সেট রাখা ভালো।
+            // chickenGroup.style.left = "0px"; 
 
-            // ৩. লজিক: ৯০% জেতার চান্স (সহজ করা হয়েছে)
+            // ৯০% সেফ চান্স
             let isSafe = Math.random() > 0.1; 
             
             setTimeout(() => {
                 spawnResultCar(currentStep, isSafe);
-            }, 300); // একটু দেরিতে গাড়ি আসবে
+            }, 300);
         }
 
         function spawnResultCar(step, isSafe) {
-            // সঠিক কলাম খুঁজে বের করা
             const cols = document.querySelectorAll('.column');
-            // currentStep + 1 কারণ প্রথমটি 'first-col'
             const targetCol = world.children[step]; 
-
             if (!targetCol) return;
 
             const car = document.createElement("img");
@@ -278,16 +236,15 @@
 
             let topPos = -120;
             let speed = 15;
-            let stopPoint = 85; // ব্যারিয়ারের ঠিক উপরে
+            let stopPoint = 85; 
 
             let interval = setInterval(() => {
                 if (isGameOver) { clearInterval(interval); return; }
 
-                // সেফ হলে গাড়ি থামবে
                 if (isSafe && topPos >= stopPoint) {
                     clearInterval(interval);
                     isWaiting = true;
-                    btnGo.disabled = false; // আবার বাটন চালু
+                    btnGo.disabled = false; 
                     updateWin();
                     return;
                 }
@@ -295,7 +252,7 @@
                 topPos += speed;
                 car.style.top = topPos + "px";
 
-                // ক্র্যাশ লজিক
+                // ক্র্যাশ ডিটেকশন
                 if (!isSafe && topPos > 150) { 
                     triggerCrash(car);
                     clearInterval(interval);
@@ -313,23 +270,33 @@
         function triggerCrash(car) {
             isGameOver = true;
             isGameActive = false;
+            
             badge.style.background = "#e74c3c";
             badge.innerText = "CRASH";
+            
+            // বাটন পরিবর্তন
             btnGo.innerText = "TRY AGAIN";
             btnGo.style.background = "#e74c3c";
             btnGo.disabled = false;
+            
             btnCash.disabled = true;
             btnCash.style.opacity = "0.5";
             barrier.style.display = "none"; 
 
-            // গাড়ি নিচে চলে যাবে মুরগিসহ
+            // ক্র্যাশ এনিমেশন (মুরগি নিচে পড়বে)
             let crashFall = 0;
-            let fallInterval = setInterval(() => {
+            // আগের ইন্টারভাল থাকলে ক্লিয়ার করা
+            if(crashInterval) clearInterval(crashInterval);
+
+            crashInterval = setInterval(() => {
                 crashFall += 15;
                 car.style.top = (150 + crashFall) + "px";
-                chickenGroup.style.top = (50 + (crashFall/3)) + "%"; // মুরগিও নিচে যাবে
+                // মুরগি নিচে নামানো
+                chickenGroup.style.top = (50 + (crashFall/3.5)) + "%"; 
                 
-                if (crashFall > 400) clearInterval(fallInterval);
+                if (crashFall > 500) {
+                    clearInterval(crashInterval);
+                }
             }, 20);
         }
 
@@ -343,30 +310,36 @@
         }
 
         function resetGame() {
+            // ক্র্যাশ এনিমেশন বন্ধ করা (সবচেয়ে গুরুত্বপূর্ণ ফিক্স)
+            if(crashInterval) clearInterval(crashInterval);
+
             isGameOver = false;
             isGameActive = false;
             isWaiting = false;
             currentStep = 0;
             currentMultiplier = 1.00;
             
+            // বাটন রিসেট
             btnGo.innerText = "GO";
             btnGo.style.background = "#2ecc71";
             btnCash.disabled = true;
             btnCash.style.opacity = "0.5";
             cashVal.innerText = "৳ 0.00";
-            badge.innerText = "1.00x";
-            badge.style.background = "#34495e";
             
-            // মুরগিকে সেন্টারে ফেরত আনা
+            // মুরগির পজিশন জোর করে ঠিক করা
             chickenGroup.style.top = "50%";
+            chickenGroup.style.transform = "translateY(-50%)";
             
+            // সব গাড়ি মুছে ফেলা
             document.querySelectorAll('.car').forEach(c => c.remove());
             
+            // বোর্ড নতুন করে সাজানো
             initWorld();
         }
     </script>
 </body>
 </html>
-      
-                
+
+
+                            
             
